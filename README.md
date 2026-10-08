@@ -58,7 +58,7 @@
 
 # 二、决策变量：每 15 分钟做什么
 
-$$a_t \in \{\textsf{跑车},\ \textsf{充电},\ \textsf{待机}\},\quad t = 0,\dots,95$$
+$$a_t \in \lbrace \textsf{跑车},\ \textsf{充电},\ \textsf{待机}\rbrace ,\quad t = 0,\dots,95$$
 
 96 格连成一条策略。**不是** SOC，**不是**"选哪些时段充电"。
 
@@ -124,11 +124,11 @@ $$\tau(s) = \begin{cases} 1 & s \le 0.8 \\[6pt] \max\left(0.15,\; 1 - 0.85 \frac
 
 ## 状态与动作
 
-$t \in \{0,\dots,95\}$，$s$ 在 86 点 SOC 网格上 → **8,256 个状态**，每个 3 个动作。
+$t \in \lbrace 0,\dots,95\rbrace $，$s$ 在 86 点 SOC 网格上 → **8,256 个状态**，每个 3 个动作。
 
 ## 期望值 DP（确定性基线）
 
-$$V(t,s) = \max_{a}\left\{\, r_t(a) + V\left(t+1,\ s'(s,a)\right)\right\}$$
+$$V(t,s) = \max_{a}\left\lbrace \, r_t(a) + V\left(t+1,\ s'(s,a)\right)\right\rbrace $$
 
 把到达数换成均值，逆向递推，闭式，毫秒级。
 
@@ -136,7 +136,7 @@ $$V(t,s) = \max_{a}\left\{\, r_t(a) + V\left(t+1,\ s'(s,a)\right)\right\}$$
 
 状态空间不变，把随机到达数**解析求和掉**：
 
-$$V(t,s) = \max_{a}\left\{ \sum_{k=0}^{6} P(N_t{=}k)[ r(k) + V\left(t+1,\ s(k)\right) ] \right\}$$
+$$V(t,s) = \max_{a}\left\lbrace  \sum_{k=0}^{6} P(N_t{=}k)[ r(k) + V\left(t+1,\ s(k)\right) ] \right\rbrace $$
 
 ## 为什么不用 MILP
 

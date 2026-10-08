@@ -49,7 +49,7 @@
 
 ### 2.1 选择：每一格 15 分钟做什么
 
-$$a_t \in \{\textsf{DRIVE},\ \textsf{CHARGE},\ \textsf{IDLE}\}, \qquad t = 0,1,\dots,95$$
+$$a_t \in \lbrace \textsf{DRIVE},\ \textsf{CHARGE},\ \textsf{IDLE}\rbrace , \qquad t = 0,1,\dots,95$$
 
 96 格连成一条完整策略（策略空间 $3^{96}$）。
 
@@ -118,7 +118,7 @@ $$\tau(s) = \begin{cases} 1.0 & s \le 0.80 \\[4pt] \max\left(0.15,\ 1 - 0.85\fra
 
 ### 4.1 状态与维度
 
-$$\text{state} = (t, s), \qquad t \in \{0,\dots,95\},\quad s \in \{0.15, 0.16, \dots, 1.00\}$$
+$$\text{state} = (t, s), \qquad t \in \lbrace 0,\dots,95\rbrace ,\quad s \in \lbrace 0.15, 0.16, \dots, 1.00\rbrace $$
 
 **96 × 86 = 8,256 个状态**，每状态 3 个动作。闭式可解，毫秒级。
 
@@ -130,13 +130,13 @@ $$\max_{\pi}\ \mathbb{E}\left[\sum_{t=0}^{T-1}\left(\underbrace{m_t\,f_t}_{\text
 
 ### 4.3 期望值 DP（确定性基线）
 
-$$V(t,s) = \max_{a \in \mathcal{A}}\left\{\, r_t(a) + V\left(t+1,\ s'(s,a)\right)\right\}$$
+$$V(t,s) = \max_{a \in \mathcal{A}}\left\lbrace \, r_t(a) + V\left(t+1,\ s'(s,a)\right)\right\rbrace $$
 
 把到达数 $N_t$ 换成其均值 $\lambda_t$，逆向递推。
 
 ### 4.4 MDP（泊松随机，解析求和掉到达数）
 
-$$V(t,s) = \max_{a \in \mathcal{A}}\left\{ \sum_{k=0}^{K} P(N_t{=}k)[ r_t(k,a) + V\left(t+1,\ s'(s,k,a)\right) ] \right\}$$
+$$V(t,s) = \max_{a \in \mathcal{A}}\left\lbrace  \sum_{k=0}^{K} P(N_t{=}k)[ r_t(k,a) + V\left(t+1,\ s'(s,k,a)\right) ] \right\rbrace $$
 
 其中 $K=6$（截断），$P(N_t{=}k) = \frac{\lambda_t^k e^{-\lambda_t}}{k!}$。状态空间不变。
 

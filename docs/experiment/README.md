@@ -33,7 +33,7 @@
 
 ### 1.3 派生出的 96 格画像
 
-每个 15 分钟格 $t \in \{0,\dots,95\}$：
+每个 15 分钟格 $t \in \lbrace 0,\dots,95\rbrace $：
 
 | 量 | 定义 |
 |---|---|
@@ -58,7 +58,7 @@ $u_{\text{peak}} = 85\%$ 为**假设的晚高峰载客率**（Assumption，扫�
 
 ### 2.1 决策变量（被优化）
 
-$$a_t \in \{\textsf{DRIVE},\ \textsf{CHARGE},\ \textsf{IDLE}\},\quad t = 0,\dots,95$$
+$$a_t \in \lbrace \textsf{DRIVE},\ \textsf{CHARGE},\ \textsf{IDLE}\rbrace ,\quad t = 0,\dots,95$$
 
 ### 2.2 参数：基准值
 
