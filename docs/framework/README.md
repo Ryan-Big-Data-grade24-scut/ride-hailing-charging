@@ -84,8 +84,7 @@ $$m_t = \min\left(N_t,\ \textsf{CAP}\right), \qquad \textsf{CAP} = 1.01\ \text{�
 
 #### C2 · 能量守恒与 reserve 硬底
 
-$$s_{t+1} = s_t - \frac{m_t e_t}{Q} \quad (\textsf{DRIVE}), \qquad
-s_{t+1} = \min\!\left(1,\ s_t + \frac{P\,\tau(s_t)\,\eta\,\Delta t}{Q}\right) \quad (\textsf{CHARGE})$$
+$$s_{t+1} = s_t - \frac{m_t e_t}{Q} \quad (\textsf{DRIVE}), \qquad s_{t+1} = \min\left(1,\ s_t + \frac{P \tau(s_t)\eta \Delta t}{Q}\right) \quad (\textsf{CHARGE})$$
 
 并要求 $s_t \ge s^{\min} = 0.15$ 恒成立。
 
@@ -125,7 +124,7 @@ $$\text{state} = (t, s), \qquad t \in \{0,\dots,95\},\quad s \in \{0.15, 0.16, \
 
 ### 4.2 目标函数
 
-$$\max_{\pi}\ \mathbb{E}\left\[\sum_{t=0}^{T-1}\left(\underbrace{m_t\,f_t}_{\textsf{车费收入}} - \underbrace{\lambda_t^{TOU}\,P\,\Delta t}_{\textsf{电费}}\right)\right]$$
+$$\max_{\pi}\ \mathbb{E}\left[\sum_{t=0}^{T-1}\left(\underbrace{m_t\,f_t}_{\textsf{车费收入}} - \underbrace{\lambda_t^{TOU}\,P\,\Delta t}_{\textsf{电费}}\right)\right]$$
 
 注意：$\textsf{DRIVE}$ 拿收入不付电费，$\textsf{CHARGE}$ 付电费不拿收入——**这正是取舍的来源**。
 
@@ -137,7 +136,7 @@ $$V(t,s) = \max_{a \in \mathcal{A}}\left\{\, r_t(a) + V\left(t+1,\ s'(s,a)\right
 
 ### 4.4 MDP（泊松随机，解析求和掉到达数）
 
-$$V(t,s) = \max_{a \in \mathcal{A}}\left\{\ \sum_{k=0}^{K} P(N_t{=}k)\left\[\, r_t(k,a) + V\left(t+1,\ s'(s,k,a)\right)\right]\ \right\}$$
+$$V(t,s) = \max_{a \in \mathcal{A}}\left\{ \sum_{k=0}^{K} P(N_t{=}k)[ r_t(k,a) + V\left(t+1,\ s'(s,k,a)\right) ] \right\}$$
 
 其中 $K=6$（截断），$P(N_t{=}k) = \frac{\lambda_t^k e^{-\lambda_t}}{k!}$。状态空间不变。
 

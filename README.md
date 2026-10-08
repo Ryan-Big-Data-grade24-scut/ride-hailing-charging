@@ -136,7 +136,7 @@ $$V(t,s) = \max_{a}\left\{\, r_t(a) + V\left(t+1,\ s'(s,a)\right)\right\}$$
 
 状态空间不变，把随机到达数**解析求和掉**：
 
-$$V(t,s) = \max_{a}\left\{\, \sum_{k=0}^{6} P(N_t{=}k)\left\[\, r(k) + V\left(t+1,\ s(k)\right)\right]\right\}$$
+$$V(t,s) = \max_{a}\left\{ \sum_{k=0}^{6} P(N_t{=}k)[ r(k) + V\left(t+1,\ s(k)\right) ] \right\}$$
 
 ## 为什么不用 MILP
 
