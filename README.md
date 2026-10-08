@@ -1,12 +1,16 @@
 # 电动网约车司机日内充电策略优化
 
-> 《优化方法》课程期末大作业 · 自拟方向
+### When Should an Electric Ride-Hailing Driver Charge?
+### Optimal Intra-Day Charging under Stochastic Order Demand and Time-of-Use Pricing
+
+> 《优化方法》课程期末大作业 · 自拟方向 · Optimization Methods, Final Project
 > **本文件是给队友看的项目说明书。** 它先把逻辑讲清楚，再给目录导航。
 > 想看论文素材，去 `docs/`；想看要交什么，去 `submit/`。
 
 > ## 一句话
 >
 > **最便宜的电，不是最后该买的电。**
+> *The cheapest kWh is not the last kWh you should buy.*
 > 动态规划给出的最优策略在 **04:30** 和 **10:30** 充电 —— 而 **10:30 并不在谷段**。
 > 照着分时电价表充电的司机，**600 个工作日里有 89% 撑不到收车**。
 
