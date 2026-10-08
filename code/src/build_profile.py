@@ -26,8 +26,12 @@ import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(HERE, "data", "yellow_tripdata_2024-01.parquet")
-OUT = os.path.join(HERE, "profile")
+# Repo root is two levels up from code/src/. The raw parquet (47.6 MB) lives
+# in data/ and is gitignored; download it from
+#   https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01.parquet
+ROOT = os.path.normpath(os.path.join(HERE, os.pardir, os.pardir))
+DATA = os.path.join(ROOT, "data", "yellow_tripdata_2024-01.parquet")
+OUT = os.path.join(ROOT, "data")
 
 SLOT_MIN = 15
 N_SLOTS = int(24 * 60 / SLOT_MIN)  # 96

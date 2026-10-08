@@ -1,5 +1,6 @@
-﻿import sys, numpy as np
-sys.path.insert(0, r"E:\Ufolder\Current\ActionSys\Hgclass\OM\proj\网约车充电\code")
+﻿import sys, os, numpy as np
+# ev_dp.py lives alongside this script, so running from code/src is enough
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.stdout.reconfigure(encoding="utf-8")
 from ev_dp import Env, evaluate, run_policy, solve_mdp
 

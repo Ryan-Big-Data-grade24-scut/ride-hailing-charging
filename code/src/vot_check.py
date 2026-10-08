@@ -1,5 +1,5 @@
-﻿import sys, numpy as np
-sys.path.insert(0, r"E:\Ufolder\Current\ActionSys\Hgclass\OM\proj\网约车充电\code")
+﻿import sys, os, json, numpy as np
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.stdout.reconfigure(encoding="utf-8")
 from ev_dp import Env
 env = Env()

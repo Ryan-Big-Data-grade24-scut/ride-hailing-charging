@@ -56,6 +56,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # run straight out of the build directory. Look in both so the code runs
 # as-is from either place.
 _PROF_CANDIDATES = [
+    os.path.join(HERE, os.pardir, os.pardir, "data", "profile.json"),  # repo layout
     os.path.join(HERE, os.pardir, "data", "profile.json"),
     os.path.join(HERE, "profile", "profile.json"),
     os.path.join(HERE, "data", "profile.json"),
