@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 原始数据：47.6 MB，可从 NYC TLC 重新下载
+# 下载地址与清洗规则见 docs/experiment/README.md §1.1
+data/*.parquet
+data/*.csv.gz
+
+# 实验输出：由 code/src/run_experiments.py 生成
+# 保留它们是为了让论文数字可追溯；若仓库变大会考虑改为不追踪
+# results/
+# figures/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Office 临时文件
+~$*
+*.tmp
