@@ -94,7 +94,7 @@ s_{t+1} = \min\!\left(1,\ s_t + \frac{P\,\tau(s_t)\,\eta\,\Delta t}{Q}\right) \q
 
 #### C3 · CC–CV 功率衰减
 
-$$\tau(s) = \begin{cases} 1.0 & s \le 0.80 \\[4pt] \max\!\left(0.15,\ 1 - 0.85\,\dfrac{s-0.80}{0.20}\right) & s > 0.80 \end{cases}$$
+$$\tau(s) = \begin{cases} 1.0 & s \le 0.80 \\[4pt] \max\left(0.15,\ 1 - 0.85\frac{s-0.80}{0.20}\right) & s > 0.80 \end{cases}$$
 
 它让"充到 100%"变成坏主意：最后 20% 的每 kWh 成本从 \$0.19 升到 \$0.23。
 
@@ -125,21 +125,21 @@ $$\text{state} = (t, s), \qquad t \in \{0,\dots,95\},\quad s \in \{0.15, 0.16, \
 
 ### 4.2 目标函数
 
-$$\max_{\pi}\ \mathbb{E}\left[\sum_{t=0}^{T-1}\Big(\underbrace{m_t\,f_t}_{\textsf{车费收入}} - \underbrace{\lambda_t^{TOU}\,P\,\Delta t}_{\textsf{电费}}\Big)\right]$$
+$$\max_{\pi}\ \mathbb{E}\left[\sum_{t=0}^{T-1}\left(\underbrace{m_t\,f_t}_{\textsf{车费收入}} - \underbrace{\lambda_t^{TOU}\,P\,\Delta t}_{\textsf{电费}}\right)\right]$$
 
 注意：$\textsf{DRIVE}$ 拿收入不付电费，$\textsf{CHARGE}$ 付电费不拿收入——**这正是取舍的来源**。
 
 ### 4.3 期望值 DP（确定性基线）
 
-$$V(t,s) = \max_{a \in \mathcal{A}}\Big\{\, r_t(a) + V\big(t+1,\ s'(s,a)\big)\Big\}$$
+$$V(t,s) = \max_{a \in \mathcal{A}}\left\{\, r_t(a) + V\left(t+1,\ s'(s,a)\right)\right\}$$
 
 把到达数 $N_t$ 换成其均值 $\lambda_t$，逆向递推。
 
 ### 4.4 MDP（泊松随机，解析求和掉到达数）
 
-$$V(t,s) = \max_{a \in \mathcal{A}}\left\{\ \sum_{k=0}^{K} P(N_t{=}k)\Big[\, r_t(k,a) + V\big(t+1,\ s'(s,k,a)\big)\Big]\ \right\}$$
+$$V(t,s) = \max_{a \in \mathcal{A}}\left\{\ \sum_{k=0}^{K} P(N_t{=}k)\left[\, r_t(k,a) + V\left(t+1,\ s'(s,k,a)\right)\right]\ \right\}$$
 
-其中 $K=6$（截断），$P(N_t{=}k) = \dfrac{\lambda_t^k e^{-\lambda_t}}{k!}$。状态空间不变。
+其中 $K=6$（截断），$P(N_t{=}k) = \frac{\lambda_t^k e^{-\lambda_t}}{k!}$。状态空间不变。
 
 ### 4.5 为什么不用 MILP
 

@@ -102,7 +102,7 @@ $$s_{t+1} = s_t - \frac{m_t\,e_t}{Q} \quad\text{(跑车)} \qquad s_{t+1} = s_t +
 
 ## 🥇 一级：CC–CV 衰减
 
-$$\tau(s) = \begin{cases} 1 & s \le 0.8 \\[2pt] \max\!\big(0.15,\; 1 - 0.85\,\tfrac{s-0.8}{0.2}\big) & s > 0.8 \end{cases}$$
+$$\tau(s) = \begin{cases} 1 & s \le 0.8 \\[6pt] \max\left(0.15,\; 1 - 0.85 \frac{s-0.8}{0.2}\right) & s > 0.8 \end{cases}$$
 
 它让"充到 100%"变成坏主意：最后 20% 每 kWh 成本从 \$0.19 升到 \$0.23。
 
@@ -128,7 +128,7 @@ $t \in \{0,\dots,95\}$，$s$ 在 86 点 SOC 网格上 → **8,256 个状态**，
 
 ## 期望值 DP（确定性基线）
 
-$$V(t,s) = \max_{a}\Big\{\, r_t(a) + V\big(t+1,\ s'(s,a)\big)\Big\}$$
+$$V(t,s) = \max_{a}\left\{\, r_t(a) + V\left(t+1,\ s'(s,a)\right)\right\}$$
 
 把到达数换成均值，逆向递推，闭式，毫秒级。
 
@@ -136,7 +136,7 @@ $$V(t,s) = \max_{a}\Big\{\, r_t(a) + V\big(t+1,\ s'(s,a)\big)\Big\}$$
 
 状态空间不变，把随机到达数**解析求和掉**：
 
-$$V(t,s) = \max_{a}\left\{\, \sum_{k=0}^{6} P(N_t{=}k)\big[\, r(k) + V\big(t+1,\ s(k)\big)\big]\right\}$$
+$$V(t,s) = \max_{a}\left\{\, \sum_{k=0}^{6} P(N_t{=}k)\left[\, r(k) + V\left(t+1,\ s(k)\right)\right]\right\}$$
 
 ## 为什么不用 MILP
 
