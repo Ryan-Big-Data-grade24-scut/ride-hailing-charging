@@ -125,7 +125,7 @@ $$\text{state} = (t, s), \qquad t \in \{0,\dots,95\},\quad s \in \{0.15, 0.16, \
 
 ### 4.2 目标函数
 
-$$\max_{\pi}\ \mathbb{E}\left[\sum_{t=0}^{T-1}\left(\underbrace{m_t\,f_t}_{\textsf{车费收入}} - \underbrace{\lambda_t^{TOU}\,P\,\Delta t}_{\textsf{电费}}\right)\right]$$
+$$\max_{\pi}\ \mathbb{E}\left\[\sum_{t=0}^{T-1}\left(\underbrace{m_t\,f_t}_{\textsf{车费收入}} - \underbrace{\lambda_t^{TOU}\,P\,\Delta t}_{\textsf{电费}}\right)\right]$$
 
 注意：$\textsf{DRIVE}$ 拿收入不付电费，$\textsf{CHARGE}$ 付电费不拿收入——**这正是取舍的来源**。
 
@@ -137,7 +137,7 @@ $$V(t,s) = \max_{a \in \mathcal{A}}\left\{\, r_t(a) + V\left(t+1,\ s'(s,a)\right
 
 ### 4.4 MDP（泊松随机，解析求和掉到达数）
 
-$$V(t,s) = \max_{a \in \mathcal{A}}\left\{\ \sum_{k=0}^{K} P(N_t{=}k)\left[\, r_t(k,a) + V\left(t+1,\ s'(s,k,a)\right)\right]\ \right\}$$
+$$V(t,s) = \max_{a \in \mathcal{A}}\left\{\ \sum_{k=0}^{K} P(N_t{=}k)\left\[\, r_t(k,a) + V\left(t+1,\ s'(s,k,a)\right)\right]\ \right\}$$
 
 其中 $K=6$（截断），$P(N_t{=}k) = \frac{\lambda_t^k e^{-\lambda_t}}{k!}$。状态空间不变。
 
