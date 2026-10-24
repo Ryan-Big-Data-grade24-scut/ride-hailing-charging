@@ -93,10 +93,12 @@ def fig1(env: Env) -> None:
                        ha="center", fontsize=8, color=ACC, fontweight="bold")
     ax[2].set_ylabel("SOC")
     ax[2].set_xlabel("hour of day")
-    ax[2].set_ylim(0, 1.28)
+    ax[2].set_ylim(0, 1.38)
     ax[2].set_xticks(range(0, 25, 2))
-    ax[2].legend(frameon=False, fontsize=8, loc="lower left", ncol=3,
-                bbox_to_anchor=(0.0, 0.0))
+    # the legend goes in the upper right: the state-of-charge curve leaves
+    # that corner empty, while the lower left is occupied by the reserve
+    # line and the curve's tail.
+    ax[2].legend(frameon=False, fontsize=8, loc="upper right", ncol=3)
 
     fig.savefig(os.path.join(FIGS, "F1_day_in_picture.png"))
     plt.close(fig)
@@ -191,32 +193,67 @@ def fig4(env: Env) -> None:
     ax.set_title("A: the taper", loc="left", fontweight="bold", color=INK)
     ax.set_ylim(0, 105)
 
-    # Effective $/kWh DELIVERED. The charger draws full rated power but stops
-    # banking energy above the knee, so the money spent per useful kWh rises
-    # steeply through the taper. This is an average cost-to-date: the money
-    # spent lifting the pack from the reserve up to SOC s, divided by the
-    # energy actually banked.
+    # Effective $/kWh DELIVERED -- computed on the PHYSICALLY REALISABLE
+    # trajectory. The pack saturates at 100%, so money spent beyond that buys
+    # no energy at all; the earlier version of this panel accumulated 300
+    # slots of cash against an unbounded pack and was therefore wrong.
+    #
+    # Two quantities are shown:
+    #   (i)  the MARGINAL cost of the next kWh at SOC s:
+    #            c_marg(s) = price / (eta * tau(s))
+    #        because the driver pays for the charger slot at the charger's
+    #        rated power, the kWh actually banked in a slot is P*tau(s)*eta*dt;
+    #   (ii) the AVERAGE cost-to-date of the charge that lifted the pack from
+    #        the reserve up to SOC s.
     price = env.price[46]                       # 11:30, shoulder tier
-    d_soc = 0.01
-    # money spent per unit SOC, and energy banked per unit SOC
-    cash_per_soc = env.p_kw * price * env.dt_h          # $ per full-power slot
-    e_per_soc = env.p_kw * t * env.eta_c * env.dt_h     # kWh banked this slot
-    cum_cash = np.cumsum(np.full_like(s, cash_per_soc))
-    cum_e = np.cumsum(e_per_soc)
-    eff = cum_cash / np.maximum(cum_e, 1e-9)
+    slot_cash = env.p_kw * price * env.dt_h     # $ for one full-power slot
 
-    ax2.plot(s * 100, np.full_like(s, price), color=GRY, lw=2.2, ls="--",
-             label="tariff (nominal)")
-    ax2.plot(s * 100, eff, color=ACC, lw=2.2,
-             label="effective, incl. taper")
+    # (ii) average cost-to-date, on the capacity-capped trajectory
+    s_grid = np.linspace(env.soc_res, 1.0, 200)
+    avg_cost = []
+    for target in s_grid:
+        s = env.soc_res
+        cash = 0.0
+        e = 0.0
+        while s < target - 1e-12:
+            tau = float(taper(s, env.eta_cc))
+            cash += slot_cash
+            gain = min(env.p_kw * tau * env.eta_c * env.dt_h,
+                       (1.0 - s) * env.batt)
+            s += gain / env.batt
+            e += gain
+        avg_cost.append(cash / max(e, 1e-9))
+    avg_cost = np.array(avg_cost)
+
+    # (i) marginal cost of the next kWh
+    t_grid = taper(s_grid, env.eta_cc)
+    marg = price / (env.eta_c * np.maximum(t_grid, 1e-9))
+
+    ax2.plot(s_grid * 100, np.full_like(s_grid, price), color=GRY, lw=2.2,
+             ls="--", label="tariff (nominal)")
+    ax2.plot(s_grid * 100, marg, color=ACC, lw=2.2,
+             label="marginal cost of next kWh")
+    ax2.plot(s_grid * 100, avg_cost, color=INK, lw=1.8, ls="-.",
+             label="average cost-to-date")
     ax2.axvline(env.eta_cc * 100, color=INK, ls="--", lw=1)
     ax2.annotate("knee", (env.eta_cc * 100 + 1, price), fontsize=8, color=INK)
     ax2.set_xlabel("state of charge (%)")
-    ax2.set_ylabel("average cost per kWh\nstored so far ($/kWh)")
-    ax2.set_ylim(0, max(price * 3, float(np.nanmax(eff)) * 1.05))
+    ax2.set_ylabel("cost per kWh stored ($/kWh)")
+    ax2.set_ylim(0, max(price * 3, float(np.nanmax(marg)) * 1.05))
     ax2.set_title("B: the last 20% costs the most per kWh", loc="left",
                   fontweight="bold", color=INK)
     ax2.legend(frameon=False, fontsize=8, loc="upper left")
+
+    # How many slots does it take to cross the taper at all? At 60 kW into a
+    # 40 kWh pack one 15-min slot banks 13.8 kWh = 34.5% SOC, so the pack
+    # saturates inside a single slot and the taper is never resolved by the
+    # time grid. This is why ablation A3 changes nothing.
+    kwh_per_slot = env.p_kw * env.eta_c * env.dt_h
+    soc_per_slot = kwh_per_slot / env.batt
+    print(f"  [F4] {kwh_per_slot:.1f} kWh per slot = {soc_per_slot:.1%} SOC;"
+          f" slots from {env.soc_res:.0%} to the knee:"
+          f" {(env.eta_cc - env.soc_res) / soc_per_slot:.1f}")
+
     fig.savefig(os.path.join(FIGS, "F4_taper.png"))
     plt.close(fig)
 

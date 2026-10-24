@@ -82,14 +82,21 @@ def main():
     feasible = per_day_df[per_day_df["feasible"]]
     nf = len(feasible)
 
+    # Count the two kinds of day over the FEASIBLE days only. Counting the
+    # numerator over all 600 days while dividing by the 570 feasible ones
+    # silently inflates both shares (it used to report 76.3% / 28.9%).
+    off_feasible = int((feasible["n_off_valley"] > 0).sum())
+    valley_only_feasible = int(
+        ((feasible["n_off_valley"] == 0) & (feasible["n_charge_slots"] > 0)).sum())
+
     print("=" * 72)
     print("MDP policy: charging behaviour over {} Monte-Carlo days".format(N_SIMS))
     print("=" * 72)
     print(f"  feasible days                  : {nf} / {N_SIMS}")
-    print(f"  days charging OUTSIDE the valley: {n_off} / {nf}"
-          f"  ({n_off / max(nf, 1):.1%} of feasible days)")
-    print(f"  days charging ONLY in the valley: {n_valley_only} / {nf}"
-          f"  ({n_valley_only / max(nf, 1):.1%})")
+    print(f"  days charging OUTSIDE the valley: {off_feasible} / {nf}"
+          f"  ({off_feasible / max(nf, 1):.1%} of feasible days)")
+    print(f"  days charging ONLY in the valley: {valley_only_feasible} / {nf}"
+          f"  ({valley_only_feasible / max(nf, 1):.1%})")
     print()
     print("  number of charging slots per day:")
     vc = feasible["n_charge_slots"].value_counts().sort_index()

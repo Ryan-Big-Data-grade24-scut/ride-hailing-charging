@@ -30,10 +30,11 @@ import tempfile
 
 from docx import Document
 from docx.enum.section import WD_SECTION
+from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
-from docx.shared import Cm, Pt
+from docx.shared import Cm, Pt, RGBColor
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "reference.docx")
@@ -42,7 +43,8 @@ FONT = "Times New Roman"
 
 
 def set_style(doc, name, size=None, bold=None, italic=None,
-              align=None, line=None, space_after=None, space_before=None):
+              align=None, line=None, space_after=None, space_before=None,
+              color=None):
     """Patch one named style. Missing styles are skipped (pandoc's default
     reference document does not define every style we might want)."""
     try:
@@ -64,6 +66,10 @@ def set_style(doc, name, size=None, bold=None, italic=None,
         f.bold = bold
     if italic is not None:
         f.italic = italic
+    if color is not None:
+        # pandoc's default reference document paints the headings in the
+        # theme accent colour; a course paper wants plain black.
+        f.color.rgb = RGBColor(0, 0, 0)
     pf = getattr(st, "paragraph_format", None)
     if align is not None and pf is not None:
         pf.alignment = align
@@ -154,33 +160,55 @@ def main() -> None:
     C = WD_ALIGN_PARAGRAPH.CENTER
 
     set_style(doc, "Normal", 10.5, align=J, line=1.5, space_after=0,
-              space_before=0)
-    set_style(doc, "Body Text", 10.5, align=J, line=1.5)
-    set_style(doc, "First Paragraph", 10.5, align=J, line=1.5)
-    set_style(doc, "Compact", 10.5, align=J, line=1.5)
+              space_before=0, color="black")
+    set_style(doc, "Body Text", 10.5, align=J, line=1.5, color="black")
+    set_style(doc, "First Paragraph", 10.5, align=J, line=1.5, color="black")
+    # "Compact" is what pandoc puts in table cells. 10 pt single-spaced keeps
+    # the wide comparison tables on one page instead of stranding them.
+    # table cells: LEFT, not justified. In a narrow column, justification
+    # stretches the spaces into rivers of white space.
+    L = WD_ALIGN_PARAGRAPH.LEFT
+    set_style(doc, "Compact", 10, align=L, line=1.0, color="black")
+    # Pandoc's own reference document does not define a "Source Code"
+    # paragraph style; if it is missing, pandoc invents one in the OUTPUT
+    # document, inheriting Normal's justified alignment, and then the first
+    # line of every code block is stretched across the page. Define it here
+    # so the appendix commands render correctly.
+    try:
+        doc.styles["Source Code"]
+    except KeyError:
+        st = doc.styles.add_style("Source Code", WD_STYLE_TYPE.PARAGRAPH)
+        st.base_style = doc.styles["Normal"]
+    set_style(doc, "Source Code", 9, align=L, line=1.0, color="black")
+    set_style(doc, "Verbatim Char", 9, align=L)
+    # the guide puts the abstract and keywords at 10.5 pt (五号)
+    set_style(doc, "Abstract", 10.5, align=J, line=1.5, color="black")
+    set_style(doc, "Abstract Title", 10.5, bold=True, align=J, line=1.5, color="black")
     set_style(doc, "Title", 14, bold=True, align=C, line=1.15,
-              space_after=12)
-    set_style(doc, "Subtitle", 10.5, align=C, line=1.15)
-    set_style(doc, "Author", 10.5, align=C, line=1.15, space_after=6)
-    set_style(doc, "Date", 10.5, align=C, line=1.15)
+              space_after=12, color="black")
+    set_style(doc, "Subtitle", 10.5, align=C, line=1.15, color="black")
+    set_style(doc, "Author", 10.5, align=C, line=1.15, space_after=6, color="black")
+    set_style(doc, "Date", 10.5, align=C, line=1.15, color="black")
     set_style(doc, "Heading 1", 12, bold=True, italic=False, align=J,
-              line=1.5, space_before=12, space_after=6)
+              line=1.5, space_before=12, space_after=6, color="black")
     set_style(doc, "Heading 2", 10.5, bold=True, italic=False, align=J,
-              line=1.5, space_before=10, space_after=4)
+              line=1.5, space_before=10, space_after=4, color="black")
     set_style(doc, "Heading 3", 10.5, bold=False, italic=True, align=J,
-              line=1.5, space_before=8, space_after=4)
+              line=1.5, space_before=8, space_after=4, color="black")
     set_style(doc, "Heading 4", 10.5, bold=True, italic=False, align=J,
-              line=1.5)
-    set_style(doc, "Image Caption", 10, align=C, line=1.0, space_after=10,
-              space_before=4)
-    set_style(doc, "Table Caption", 10, align=C, line=1.0, space_after=4,
-              space_before=8)
-    set_style(doc, "Bibliography", 10, align=J, line=1.0, space_after=4)
-    set_style(doc, "Block Text", 10.5, align=J, line=1.5)
-    set_style(doc, "Quote", 10.5, align=J, line=1.5)
-    set_style(doc, "Source Code", 9, align=None, line=1.0)
+              line=1.5, color="black")
+    # the caption styles inherit from pandoc's "Caption", which is italic;
+    # the guide wants plain 10 pt captions, so switch the italic off
+    set_style(doc, "Image Caption", 10, italic=False, align=C, line=1.0,
+              space_after=10, space_before=4, color="black")
+    set_style(doc, "Table Caption", 10, italic=False, align=C, line=1.0,
+              space_after=4, space_before=8, color="black")
+    set_style(doc, "Bibliography", 10, align=L, line=1.0, space_after=4, color="black")
+    set_style(doc, "Block Text", 10.5, align=J, line=1.5, color="black")
+    set_style(doc, "Quote", 10.5, align=J, line=1.5, color="black")
+    set_style(doc, "Source Code", 9, align=L, line=1.0, color="black")
     set_style(doc, "Verbatim Char", 9)
-    set_style(doc, "Macro Text", 10.5)
+    set_style(doc, "Macro Text", 10.5, color="black")
 
     # the table style pandoc uses
     try:
