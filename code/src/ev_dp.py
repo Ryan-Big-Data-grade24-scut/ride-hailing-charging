@@ -97,8 +97,14 @@ def tou_price(n_slots: int = 96, spread: float = 1.0, base: float = 0.11) -> np.
 
 
 def taper(soc: np.ndarray | float, eta_cc: float = 0.80) -> np.ndarray:
-    """CC -> CV charge-power taper (1.0 up to `eta_cc`, then linear to 0.15)."""
+    """CC -> CV charge-power taper (1.0 up to `eta_cc`, then linear to 0.15).
+
+    `eta_cc >= 1.0` switches the taper OFF entirely (constant-power charging);
+    that is the setting used by ablation A3.
+    """
     soc = np.asarray(soc, dtype=float)
+    if eta_cc >= 1.0:
+        return np.ones_like(soc)
     span = 1.0 - eta_cc
     out = np.where(soc <= eta_cc, 1.0, 1.0 - 0.85 * (soc - eta_cc) / span)
     return np.clip(out, 0.15, 1.0)
@@ -127,6 +133,9 @@ class Env:
         self.p_kw = over.get("p_kw", p["charge_kw"])
         self.eta_c = over.get("eta_c", p["charge_eff"])
         self.eta_cc = over.get("eta_cc", p["eta_cc_soc"])
+        # Ablation A3: switch the CC-CV taper off (constant-power charging).
+        if over.get("no_taper", False):
+            self.eta_cc = 1.0
         self.kwh_km = over.get("kwh_km", p["kwh_per_km"])
         self.fare_scale = over.get("fare_scale", 1.0)
 
@@ -195,6 +204,16 @@ class Env:
     def s_at(self, i: int) -> float:
         return float(self.soc[i])
 
+    def set_lambda(self, lam_new) -> None:
+        """Replace the per-driver order-rate profile and refresh everything
+        derived from it. Used by ablation A6 (flatten the intra-day demand
+        swing) -- the shape of the demand curve is the structural fact under
+        test, so it has to be swappable without rebuilding the profile."""
+        self.lam = np.asarray(lam_new, dtype=float)
+        self.n_eff = np.minimum(self.lam, self.cap)
+        self.served_rev = self.n_eff * self.fare
+        self.served_kwh = self.n_eff * self.kwh
+
     def energy_served_total(self) -> float:
         """kWh a driver would burn if time-capped on the road all day."""
         return float(self.served_kwh.sum())
@@ -234,7 +253,7 @@ class Env:
 # ===========================================================================
 # Deterministic DP  (expected-value; orders replaced by their mean)
 # ===========================================================================
-def solve_dp(env: Env):
+def solve_dp(env: Env, consistent: bool = True):
     """Backward-induction DP on the expected-value problem.
 
     Returns (V, policy) with V shape (T+1, nS) and policy shape (T, nS).
@@ -270,11 +289,27 @@ def solve_dp(env: Env):
             # on an empty battery) is what previously made the DP conclude it
             # never needed to charge at all.
             new_kwh = s * batt - ekw
-            if new_kwh >= floor_kwh - 1e-9:
+            if consistent:
+                # v2: partial service. The driver completes as many trips as
+                # the energy above the reserve floor allows -- exactly what the
+                # Monte-Carlo simulator does -- so the planner's objective is
+                # the same quantity the evaluation actually measures.
+                afford = max(0.0, s * batt - floor_kwh)
+                m = (min(env.n_eff[t], afford / env.kwh[t])
+                     if env.kwh[t] > 1e-9 else env.n_eff[t])
+                new_kwh = s * batt - m * env.kwh[t]
                 j = env.to_idx(new_kwh / batt)
-                vd = rev + Vn[j]
-                if vd > best:
-                    best, barg = vd, DRIVE
+                vd = m * env.fare[t] + Vn[j]
+            else:
+                # legacy: an outcome that breaches the reserve is dropped from
+                # the expectation, which loses probability mass
+                if new_kwh >= floor_kwh - 1e-9:
+                    j = env.to_idx(new_kwh / batt)
+                    vd = rev + Vn[j]
+                else:
+                    vd = -np.inf
+            if vd > best:
+                best, barg = vd, DRIVE
 
             # CHARGE
             new_kwh = s * batt + gain[i]
@@ -310,19 +345,27 @@ def _pois(lmb: float, kmax: int, pois_tab: np.ndarray) -> np.ndarray:
     return p / s if s > 0 else p
 
 
-def solve_mdp(env: Env, kmax: int = 6, viter: int = 60, tol: float = 1e-10):
+def solve_mdp(env: Env, kmax: int = 6, viter: int = 60, tol: float = 1e-10,
+              consistent: bool = True, V_term=None):
     """Finite-horizon backward value iteration with the arrival count summed
     out exactly. Because the horizon is fixed we can also just sweep backward
     to convergence; we do both and keep the converged one.
 
     Returns (V, policy) with policy shape (T, nS).
+
+    `V_term` overrides the terminal value function (shape (nS,)). The cyclic
+    multi-day extension uses it to link the end of a day to the start of the
+    next one.
     """
     T, nS = env.T, env.nS
     batt = env.batt
     V = np.zeros((T + 1, nS))
     pol = np.zeros((T, nS), dtype=np.int8)
-    for i, s in enumerate(env.soc):
-        V[T, i] = env.mu_end * max(0.0, s - env.soc_res) * batt
+    if V_term is None:
+        for i, s in enumerate(env.soc):
+            V[T, i] = env.mu_end * max(0.0, s - env.soc_res) * batt
+    else:
+        V[T, :] = np.asarray(V_term, dtype=float)
     gain = env.gain
     lam = env.lam
     fare = env.fare
@@ -353,15 +396,30 @@ def solve_mdp(env: Env, kmax: int = 6, viter: int = 60, tol: float = 1e-10):
             # DRIVE: summed over the Poisson arrival count. A slot whose
             # expected energy demand would breach the reserve is infeasible.
             vdrive = 0.0
-            for k in range(km + 1):
-                pk = pmf[t][k]
-                if pk < 1e-6:
-                    continue
-                nk = s * batt - row_kwh[k]
-                if nk < floor_kwh - 1e-9:
-                    continue          # cannot serve this outcome
-                j = env.to_idx(nk / batt)
-                vdrive += pk * (row_earn[k] + Vn[j])
+            if consistent:
+                # v2: partial service, same rule as the simulator, and the
+                # full probability mass is kept -- so V really is the
+                # expectation of what the Monte-Carlo evaluation measures.
+                afford = max(0.0, s * batt - floor_kwh)
+                for k in range(km + 1):
+                    pk = pmf[t][k]
+                    if pk < 1e-12:
+                        continue
+                    m = (min(served[k], afford / kwh[t])
+                         if kwh[t] > 1e-9 else served[k])
+                    nk = s * batt - m * kwh[t]
+                    j = env.to_idx(nk / batt)
+                    vdrive += pk * (m * fare[t] + Vn[j])
+            else:
+                for k in range(km + 1):
+                    pk = pmf[t][k]
+                    if pk < 1e-6:
+                        continue
+                    nk = s * batt - row_kwh[k]
+                    if nk < floor_kwh - 1e-9:
+                        continue          # cannot serve this outcome
+                    j = env.to_idx(nk / batt)
+                    vdrive += pk * (row_earn[k] + Vn[j])
             if vdrive > best:
                 best, barg = vdrive, DRIVE
 
@@ -406,7 +464,7 @@ def baseline_threshold(env: Env, thresh: float = 0.30):
 def run_policy(env: Env, kind: str, rng: np.random.Generator, **kw):
     """Simulate one driver-day under a given policy with Poisson arrivals.
 
-    kind: 'dp' | 'mdp' | 'cheapest' | 'threshold' | 'greedy'
+    kind: 'dp' | 'mdp' | 'cheapest' | 'threshold' | 'charge-full' | 'never-charge'
     Returns dict with revenue, energy cost, net, energy used, feasibility.
     """
     T, batt = env.T, env.batt
@@ -438,10 +496,18 @@ def run_policy(env: Env, kind: str, rng: np.random.Generator, **kw):
             if charging and s >= min(0.95, thresh + 0.25):
                 charging = False
             a = CHARGE if charging else DRIVE
-        elif kind == "always-drive":
-            a = DRIVE
         elif kind == "never-charge":
             a = DRIVE
+        elif kind == "charge-full":
+            # Naive driver behaviour: once the pack drops below the trigger,
+            # keep charging until it is FULL (or the day ends). Same trigger
+            # as the threshold baseline, different target -- this isolates
+            # what the CC-CV taper costs when you over-charge.
+            if s >= 0.999:
+                charging = False
+            elif s < thresh:
+                charging = True
+            a = CHARGE if charging else DRIVE
         else:
             raise ValueError(kind)
 

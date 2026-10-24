@@ -19,8 +19,9 @@ import pandas as pd
 from ev_dp import CHARGE, DRIVE, Env, solve_mdp, taper
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RES = os.path.join(HERE, "results")
-FIGS = os.path.join(HERE, "figures")
+ROOT = os.path.normpath(os.path.join(HERE, os.pardir, os.pardir))
+RES = os.path.join(ROOT, "results")
+FIGS = os.path.join(ROOT, "figures")
 os.makedirs(FIGS, exist_ok=True)
 
 plt.rcParams.update({

@@ -1,0 +1,16 @@
+quantity,value,unit
+cyclic iterations to converge,34,sweeps
+final centred residual,9.287965951898514e-10,$
+shadow price mu of stored energy (cyclic),0.2414044916861569,$/kWh
+shadow price mu of stored energy (20-day DP),0.2414044917087208,$/kWh
+TOU minimum price,0.11,$/kWh
+TOU maximum price,0.42,$/kWh
+optimal start-of-day SOC (cyclic),0.36818403614688366,fraction
+optimal start-of-day SOC (20-day DP),0.36818403614688366,fraction
+sd of start-of-day SOC (cyclic),0.10688061741801505,fraction
+average daily net (cyclic),923.6212412352993,$/day
+average daily net (20-day DP middle day),923.6212412352993,$/day
+average daily net (single-day MDP from 80%),946.4569008008957,$/day
+charge slots (cyclic),"04:45, 12:00",clock
+"charge slots (20-day DP, middle day)","04:45, 12:00",clock
+energy drawn per day (cyclic),41.03581425147359,kWh

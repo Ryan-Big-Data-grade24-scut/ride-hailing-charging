@@ -15,19 +15,28 @@
   "price_min": 0.11,
   "price_max": 0.42
  },
- "dp_value": 1242.6134005095741,
- "mdp_value": 939.302813646062,
+ "dp_value_if_demand_known": 1242.6134005095741,
+ "dp_policy_net_under_stochastic_demand": 934.1549852996203,
+ "dp_policy_feasible_rate": 0.8483333333333334,
+ "mdp_value": 939.554474051292,
  "best_rule_baseline": "Baseline: threshold SOC<40%",
  "best_rule_baseline_net": 924.9844671237814,
- "mdp_net_mc": 948.698709159611,
- "value_of_optimisation": 166.0703248282357,
- "value_of_optimisation_pct": 17.953850116491974,
+ "tariff_following_net": 788.2076170714721,
+ "tariff_following_feasible": 0.10833333333333334,
+ "mdp_net_mc": 946.4569008008957,
+ "mdp_feasible": 0.95,
+ "gain_vs_best_simple_rule": 21.47243367711428,
+ "gain_vs_best_simple_rule_pct": 2.3213831626689188,
+ "gain_vs_tariff_following": 158.2492837294236,
+ "gain_vs_tariff_following_pct": 20.077106627995715,
  "mdp_charge_slots": [
-  "04:30",
-  "10:30"
+  "04:45",
+  "11:15",
+  "20:30"
  ],
  "mdp_charge_slots_off_cheapest": [
-  "10:30"
+  "11:15",
+  "20:30"
  ],
  "valley_slots": [
   "00:00",

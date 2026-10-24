@@ -19,7 +19,8 @@ from ev_dp import (CHARGE, DRIVE, Env, evaluate, run_policy, solve_dp,
                    solve_mdp, tou_price)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "results")
+ROOT = os.path.normpath(os.path.join(HERE, os.pardir, os.pardir))
+OUT = os.path.join(ROOT, "results")
 SEED = 20261001
 N_SIMS = 600
 
@@ -58,7 +59,7 @@ def main() -> None:
     policies = {
         "MDP (stochastic DP)": ("mdp", pol_mdp),
         "DP (expected value)": ("dp", pol_dp),
-        "Baseline: always drive": ("always-drive", None),
+        "Baseline: charge to full when SOC<40%": ("charge-full", None),
         "Baseline: never charge": ("never-charge", None),
         "Baseline: charge at cheapest hour": ("cheapest", None),
         "Baseline: threshold SOC<30%": ("threshold", None),
@@ -68,7 +69,7 @@ def main() -> None:
     rows = []
     for name, (kind, pol) in policies.items():
         kw = {}
-        if kind == "threshold":
+        if kind in ("threshold", "charge-full"):
             kw["thresh"] = float(name.split("<")[-1].rstrip("%")) / 100.0
         r = evaluate(env, pol, kind, n_sims=N_SIMS, seed=SEED, **kw)
         r["policy"] = name
