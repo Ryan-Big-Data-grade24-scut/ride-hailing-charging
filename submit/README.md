@@ -16,6 +16,7 @@
 | **1** | **英文论文** | Word（.docx）+ PDF | ✅ **已写完**：6,200 词 / 18 页 / 13 个原生公式 / 9 表 4 图 |
 | **2** | **核心代码** | 本仓库 `code/`（连同 `data/` 需求画像） | ✅ 已就绪 |
 | **3** | **主要数据集 或 数据来源说明** | 数据是 NYC TLC 公开数据，**写清楚来源+清洗规则即可** | ✅ 见 `docs/experiment/` §1 |
+| **4** | **答辩 PPT** | .pptx（另存 PDF 备份） | ✅ 12 页，指南 §7 的 9 段结构全覆盖 |
 
 **成绩构成**：课堂互动 30% + 期末大作业 **70%**
 
@@ -185,6 +186,8 @@ submit/
 ├── Final_Paper_梁睿希_202464870791.docx      ← 英文论文（提交用，18 页）
 ├── Final_Paper_梁睿希_202464870791.pdf       ← 同上导出的 PDF（用 Word 导，勿用 LibreOffice）
 ├── paper.md                                   ← 论文 Markdown 源（改内容改这个）
+├── Defense_梁睿希_202464870791.pptx            ← 答辩 PPT（12 页，11/20 同批交）
+├── Defense_梁睿希_202464870791.pdf             ← PPT 的 PDF 备份
 ├── code/                                      ← 核心代码（src/ + build_profile.py）
 ├── data/
 │   ├── profile.json                           ← 需求画像（生成物，直接给）
@@ -196,6 +199,7 @@ submit/
 │   ├── fix_table_widths.py                    ← 表格列宽按内容分配，数字不断行
 │   ├── fix_eq_tags.py / fix_lbrace_space.py   ← 修公式编号与 \lbrace 粘连
 │   ├── docx_to_pdf.py                         ← Word COM 导 PDF（唯一安全路径）
+│   ├── make_ppt.py                            ← 生成答辩 PPT
 │   └── read_guide.py                          ← 从指南原件提取格式条款
 └── README.md                                  ← 本文件
 ```
