@@ -273,7 +273,7 @@ v2 之前，**规划器和仿真器的规则不一致**：DP 在电量不足以�
 |---|---|---|
 | Figure 1 | `figures/F1_day_in_picture.png` | 一天全景：需求柱状 / TOU 阶梯电价 / SOC 轨迹与充电点 |
 | Figure 2 | `figures/F2_policy_comparison.png` | 策略对比（净收入 + 可行率双轴） |
-| Figure 3 | `figures/F3_sensitivity.png` | 7 组敏感性小多图 |
+| Figure 3 | `figures/F3_sensitivity.png` | 10 组敏感性小多图 |
 | Figure 4 | `figures/F4_taper.png` | CC–CV 衰减曲线与实际每 kWh 成本 |
 
 **表**：Table 1 策略对比（`results/policy_comparison.csv`）、Table 2 敏感性（`results/sensitivity.csv`）、Table 3 VOT 校准（上表）
@@ -319,3 +319,4 @@ python make_figures.py       # 重新生成 figures/
 | 2026-10-24 | 答辩 PPT 生成（`tools/make_ppt.py`，12 页）：标题/背景/RQ/优化问题/数据/方法/基线对比/敏感性/核心洞察/结论 + 2 页备答 | 11/20 与论文初稿同批交付 |
 | 2026-11-17 | **v3 扩展**：充电改成 excursion 宏动作（开到站→排队→充电→开回），循环多日边界 + 加油行程豁免；E1 排队扫描 / E2 策略对比 / E3 拒单罚金 / E4 硬件标定 / E5 价格结构 / E6 主扫描 / E7 需求模型 | 论文新增 §3.6（表 10–12、图 5）；**发现 1**：期望值 DP 的 \$303 账面差距有 95% 是 Jensen 缺口，"完美信息不值钱"的归因被推翻；**发现 2**：吸收陷阱与 reserve floor 的语义修正 |
 | 2026-11-17 | **v3 全套跑完（E1–E7）**并补写 E5/E6/E7 三节；论文与 PPT 重建（论文 27 页 / 13 表 5 图 / 摘要 248 词；PPT 13 页，新增 excursion 页） | **新增结论**：优化价值在**电量预算比 budget ≳ 1.1** 时才出现（低于 1 时增益 0.1–0.9%，越过 1 后 1–6% 并很快饱和）；换整套价格序列对 2024 车只值 \$0.23/天 |
+| 2026-11-17 | **PPT 与论文对齐**：敏感性扫描 7→10 组、消融 A1–A6→A1–A7、公式计数 105/101→143/114、2026 车队列代价措辞按论文改为 "\$0–\$0.58（需求匹配）/ \$18（均匀）"；新增逐页答辩讲稿 `docs/defense/speaker_script.md`；仓库 README 同步到当前结果 | 消除 PPT 与论文的实质性不一致（答辩现场会被抓） |
