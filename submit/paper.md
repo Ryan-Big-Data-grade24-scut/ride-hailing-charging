@@ -3,9 +3,11 @@ title: "When Should an Electric Ride-Hailing Driver Charge?"
 subtitle: "Optimal Intra-Day Charging under Stochastic Order Demand and Time-of-Use Pricing"
 author:
   - "Ruixi Liang (梁睿希), Student ID 202464870791"
+  - "[Team member 2 — Name, Student ID, Major and Class]"
+  - "[Team member 3 — Name, Student ID, Major and Class]"
   - "School of Future Technology, South China University of Technology, Big Data Class 1"
   - "Course: Optimization Methods (084100551)  |  Supervisor: Zhenhong Lin"
-date: "Draft, 24 October 2026"
+date: "Draft, 17 November 2026"
 lang: en-US
 ---
 
