@@ -304,7 +304,7 @@ python make_figures.py       # 重新生成 figures/
 - [x] 图 1–4 的**英文 caption**（已写入 `submit/paper.md`）
 - [x] **§5.7 的 VOT 诊断段并入论文 §2.2 Data and Assumptions**
 - [x] 论文 §4 Conclusion（消融与扩展已跑完，已写入）
-- [x] 论文正文（`submit/paper.md`，约 11,958 词 / 27 页，已完成，含 §3.6 excursion 扩展）
+- [x] 论文正文（`submit/paper.md`，约 12,587 词 / 28 页，已完成，含 §3.6 excursion 扩展）
 - [x] **答辩 PPT**（`submit/Defense_梁睿希_202464870791.pptx`，13 页，指南 §7 九段结构全覆盖）
 
 ## 9. 变更记录

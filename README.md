@@ -356,7 +356,8 @@ DP 账面高 \$303，看着完胜；但它的策略拿到真实随机需求下�
 ├── data/                  需求画像（生成物）
 ├── results/               实验输出 CSV/JSON
 ├── figures/               5 张图
-├── tools/                 论文构建链（pandoc → OMML → Word COM → PDF）与 PPT 生成
+├── tools/                 论文构建链（pandoc → OMML → Word COM → PDF）、PPT 生成，
+│                         以及 verify_claims.py（核对论文数字与 results/*.csv 一致）
 ├── submit/README.md       交付物清单 ← 交什么看这里
 └── archive/               早期笔记（已被 docs/ 取代，勿读）
 ```
