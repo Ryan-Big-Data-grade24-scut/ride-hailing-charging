@@ -113,6 +113,41 @@ def taper(soc: np.ndarray | float, eta_cc: float = 0.80) -> np.ndarray:
 # ===========================================================================
 # Environment built from the real-data profile
 # ===========================================================================
+def expected_served(lam, cap):
+    """E[min(N, cap)] for N ~ Poisson(lam): the number of orders a driver
+    actually completes in a slot.
+
+    This is NOT min(lam, cap), which is what a deterministic plan assumes:
+    that the average arrival is served in full. The assumption is
+    optimistic, because a driver who faces two arrivals in a slot with a
+    cap of one order completes one, not two. The shortfall
+
+        min(lam, cap) - E[min(N, cap)]
+
+    is strictly positive whenever the cap can bite, and at the calibrated
+    profile it is about 20% of the demand in EVERY one of the 96 slots.
+
+    The difference matters more than it looks. A deterministic plan built on
+    min(lam, cap) books far more revenue than one built on the honest
+    expectation, and the whole of the apparent gap between the
+    deterministic DP and the MDP comes from this, not from anything the
+    MDP knows about the future.
+    """
+    lam = float(lam)
+    cap = float(cap)
+    if lam <= 1e-12:
+        return 0.0
+    total = 0.0
+    pk = float(np.exp(-lam))
+    for k in range(0, 400):
+        if k > 0:
+            pk *= lam / k
+        total += pk * min(k, cap)
+        if pk < 1e-16 and k > lam + 8.0:
+            break
+    return total
+
+
 class Env:
     """Holds every parameter the DP / MDP needs, all traceable to the profile
     JSON or to an explicit assumption."""
@@ -177,13 +212,36 @@ class Env:
         # driver want fewer trips, it just makes the energy budget tighter.
         # We recompute per-trip energy from the (possibly overridden)
         # consumption rate, then cap the served count by the time cap.
-        self.n_eff = np.minimum(self.lam, self.cap)
+        # The expected number of orders the driver actually SERVES.
+        #
+        # cap_aware=False (the default, and the behaviour of the original
+        # v2 model): min(lambda, cap) -- what a deterministic plan assumes.
+        # cap_aware=True: E[min(N, cap)] -- what the driver really gets, given
+        # that a slot with two arrivals and a cap of one order ends with one
+        # order served. See expected_served() for why this is not a detail.
+        self.cap_aware = bool(over.get("cap_aware", False))
+        if self.cap_aware:
+            self.n_eff = np.array([expected_served(l, self.cap)
+                                   for l in self.lam])
+        else:
+            self.n_eff = np.minimum(self.lam, self.cap)
 
         self.served_rev = self.n_eff * self.fare
         self.served_kwh = self.n_eff * self.kwh
 
         self.price = over.get("price", tou_price(self.T))
         self.price_spread = over.get("price_spread", 1.0)
+
+        # Which pricing regime the driver faces.
+        #   "slot" -- occupancy / time billing: the driver pays for the charger
+        #             slot at rated power whether or not the pack accepts the
+        #             energy (the "包时" / occupancy-fee model).
+        #   "kwh"  -- energy billing: the driver pays for the electricity
+        #             actually drawn from the grid.
+        # These are the two regimes in use at Chinese public DC chargers, and
+        # they are NOT interchangeable: under "slot" the CC-CV taper creates a
+        # steep marginal cost per delivered kWh, under "kwh" it cancels.
+        self.billing = over.get("billing", "slot")
 
         # marginal value of stored energy left at end of day, $/kWh
         self.mu_end = over.get("mu_end", 0.0)
@@ -195,8 +253,22 @@ class Env:
 
         # charge gain per slot at each SOC level (kWh)
         self.gain = self.p_kw * taper(self.soc, self.eta_cc) * self.eta_c * self.dt_h
-        # cost of a full slot of charging at each SOC level ($)
-        self.ccost = self.price[:, None] * self.p_kw * self.dt_h   # (T,1)
+        # Cost of one charging slot, as a (T, nS) table indexed by
+        # (time, SOC level at the start of the slot), in dollars.
+        if self.billing == "kwh":
+            # energy billing: the driver pays for the electricity drawn from
+            # the grid, which is the energy delivered to the pack divided by
+            # the charging efficiency, and is capped by what the pack can
+            # still accept. Note that the CC-CV taper cancels out of the
+            # resulting $/kWh -- the slope in Figure 4 is a billing artefact.
+            grid_kwh = np.minimum(
+                self.p_kw * taper(self.soc, self.eta_cc) * self.dt_h,
+                np.maximum(0.0, (1.0 - self.soc) * self.batt) / self.eta_c,
+            )
+            self.ccost = self.price[:, None] * grid_kwh[None, :]     # (T, nS)
+        else:
+            slot = self.price[:, None] * self.p_kw * self.dt_h       # (T, 1)
+            self.ccost = np.repeat(slot, self.nS, axis=1)           # (T, nS)
 
     def to_idx(self, s: float) -> int:
         return int(np.clip(round((s - self.soc_res) / self.step), 0, self.nS - 1))
@@ -210,7 +282,11 @@ class Env:
         swing) -- the shape of the demand curve is the structural fact under
         test, so it has to be swappable without rebuilding the profile."""
         self.lam = np.asarray(lam_new, dtype=float)
-        self.n_eff = np.minimum(self.lam, self.cap)
+        if self.cap_aware:
+            self.n_eff = np.array([expected_served(l, self.cap)
+                                   for l in self.lam])
+        else:
+            self.n_eff = np.minimum(self.lam, self.cap)
         self.served_rev = self.n_eff * self.fare
         self.served_kwh = self.n_eff * self.kwh
 
@@ -274,7 +350,6 @@ def solve_dp(env: Env, consistent: bool = True):
     for t in range(T - 1, -1, -1):
         rev = env.served_rev[t]
         ekw = env.served_kwh[t]
-        cst = env.ccost[t, 0]
         gain = env.gain
         floor_kwh = env.soc_res * batt
 
@@ -314,7 +389,7 @@ def solve_dp(env: Env, consistent: bool = True):
             # CHARGE
             new_kwh = s * batt + gain[i]
             j = env.to_idx(min(1.0, new_kwh / batt))
-            vc = -cst + Vn[j]
+            vc = -env.ccost[t, i] + Vn[j]
             if vc > best:
                 best, barg = vc, CHARGE
 
@@ -378,7 +453,6 @@ def solve_mdp(env: Env, kmax: int = 6, viter: int = 60, tol: float = 1e-10,
 
     for t in range(T - 1, -1, -1):
         Vn = V[t + 1]
-        cst = ccost[t, 0]
         km = min(kmax, 6)
         # orders served is min(k, cap); energy/revenue scale linearly in m
         # so we can precompute the per-k served vector
@@ -390,7 +464,7 @@ def solve_mdp(env: Env, kmax: int = 6, viter: int = 60, tol: float = 1e-10,
         for i in range(nS):
             s = env.soc[i]
             jc = env.to_idx(min(1.0, s + gain[i] / batt))
-            vc = -cst + Vn[jc]
+            vc = -ccost[t, i] + Vn[jc]
             best, barg = vc, CHARGE
 
             # DRIVE: summed over the Poisson arrival count. A slot whose
@@ -513,9 +587,15 @@ def run_policy(env: Env, kind: str, rng: np.random.Generator, **kw):
 
         if a == CHARGE:
             g = env.p_kw * float(taper(s, env.eta_cc)) * env.eta_c * env.dt_h
+            added = min(g, max(0.0, (1.0 - s) * batt))
+            if env.billing == "kwh":
+                # pay for the electricity drawn from the grid
+                cost += env.price[t] * (added / env.eta_c)
+            else:
+                # pay for the charger slot at rated power
+                cost += env.price[t] * env.p_kw * env.dt_h
             s = min(1.0, s + g / batt)
-            cost += env.price[t] * env.p_kw * env.dt_h
-            chkwh += g
+            chkwh += added
             path.append((t, "CHARGE", s))
             charge_slots.append(t)
         elif a == DRIVE:

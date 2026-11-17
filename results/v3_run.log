@@ -1,0 +1,177 @@
+========================================================================
+E1  the queue sweep
+========================================================================
+  [E1] v2-2024  uniform  q<=0.0h  net $  909.87  feas  87.6%  offroad   7.2  04:15(k2)|12:15(k1)|23:15(k1)
+  [E1] v2-2024  uniform  q<=0.5h  net $  887.27  feas  79.4%  offroad  10.6  00:00(k1)|04:15(k2)|18:30(k1)
+  [E1] v2-2024  uniform  q<=1.0h  net $  865.30  feas  74.9%  offroad  13.1  00:00(k3)|11:15(k1)
+  [E1] v2-2024  uniform  q<=1.5h  net $  847.12  feas  66.0%  offroad  15.6  03:15(k3)|18:30(k1)
+  [E1] v2-2024  uniform  q<=2.0h  net $  830.67  feas  61.9%  offroad  17.8  03:15(k3)|18:45(k1)
+  [E1] v2-2024  demand   q<=0.0h  net $  909.87  feas  87.6%  offroad   7.2  04:15(k2)|12:15(k1)|23:15(k1)
+  [E1] v2-2024  demand   q<=0.5h  net $  899.86  feas  86.4%  offroad   8.1  00:00(k1)|04:15(k2)|12:15(k1)
+  [E1] v2-2024  demand   q<=1.0h  net $  885.14  feas  78.4%  offroad   9.4  04:15(k2)|10:15(k1)|21:45(k1)
+  [E1] v2-2024  demand   q<=1.5h  net $  873.88  feas  72.0%  offroad  10.2  00:45(k1)|04:30(k2)|12:15(k1)
+  [E1] v2-2024  demand   q<=2.0h  net $  859.45  feas  74.2%  offroad  11.4  00:00(k1)|04:30(k2)|11:15(k1)
+  [E1] v2-2024  idle     q<=0.0h  net $  909.87  feas  87.6%  offroad   7.2  04:15(k2)|12:15(k1)|23:15(k1)
+  [E1] v2-2024  idle     q<=0.5h  net $  903.43  feas  90.3%  offroad   9.3  04:00(k2)|12:45(k1)|23:00(k1)
+  [E1] v2-2024  idle     q<=1.0h  net $  893.18  feas  87.6%  offroad  10.8  03:30(k2)|18:30(k1)
+  [E1] v2-2024  idle     q<=1.5h  net $  888.05  feas  89.1%  offroad  11.9  02:45(k2)|18:30(k2)
+  [E1] v2-2024  idle     q<=2.0h  net $  884.07  feas  89.2%  offroad  13.7  03:00(k2)|18:30(k1)
+  [E1] v2-2024  meal     q<=0.0h  net $  909.87  feas  87.6%  offroad   7.2  04:15(k2)|12:15(k1)|23:15(k1)
+  [E1] v2-2024  meal     q<=0.5h  net $  898.93  feas  86.5%  offroad   7.6  00:00(k1)|04:15(k2)|17:45(k1)
+  [E1] v2-2024  meal     q<=1.0h  net $  887.34  feas  82.4%  offroad   8.0  00:00(k1)|04:15(k2)|18:15(k1)
+  [E1] v2-2024  meal     q<=1.5h  net $  886.11  feas  83.6%  offroad   8.0  00:00(k1)|04:15(k2)|17:45(k1)
+  [E1] v2-2024  meal     q<=2.0h  net $  886.19  feas  85.8%  offroad   7.9  00:00(k1)|04:15(k2)|17:15(k1)
+  [E1] 2026     uniform  q<=0.0h  net $  944.79  feas 100.0%  offroad   4.0  04:00(k3)
+  [E1] 2026     uniform  q<=0.5h  net $  940.14  feas  99.9%  offroad   6.0  03:30(k3)
+  [E1] 2026     uniform  q<=1.0h  net $  935.95  feas  99.9%  offroad   8.0  03:15(k3)
+  [E1] 2026     uniform  q<=1.5h  net $  931.52  feas  99.9%  offroad  10.0  03:00(k3)
+  [E1] 2026     uniform  q<=2.0h  net $  926.37  feas 100.0%  offroad  12.0  02:30(k3)
+  [E1] 2026     demand   q<=0.0h  net $  944.79  feas 100.0%  offroad   4.0  04:00(k3)
+  [E1] 2026     demand   q<=0.5h  net $  944.79  feas 100.0%  offroad   4.0  04:15(k3)
+  [E1] 2026     demand   q<=1.0h  net $  944.79  feas 100.0%  offroad   4.0  04:15(k3)
+  [E1] 2026     demand   q<=1.5h  net $  944.81  feas  99.9%  offroad   4.0  04:15(k3)
+  [E1] 2026     demand   q<=2.0h  net $  944.21  feas  99.9%  offroad   4.0  04:30(k3)
+  [E1] 2026     idle     q<=0.0h  net $  944.79  feas 100.0%  offroad   4.0  04:00(k3)
+  [E1] 2026     idle     q<=0.5h  net $  940.21  feas 100.0%  offroad   6.0  03:30(k3)
+  [E1] 2026     idle     q<=1.0h  net $  936.10  feas  99.9%  offroad   8.0  03:15(k3)
+  [E1] 2026     idle     q<=1.5h  net $  933.68  feas 100.0%  offroad   9.0  02:45(k3)
+  [E1] 2026     idle     q<=2.0h  net $  928.97  feas 100.0%  offroad  11.0  02:45(k3)
+  [E1] 2026     meal     q<=0.0h  net $  944.79  feas 100.0%  offroad   4.0  04:00(k3)
+  [E1] 2026     meal     q<=0.5h  net $  944.79  feas 100.0%  offroad   4.0  04:15(k3)
+  [E1] 2026     meal     q<=1.0h  net $  944.79  feas 100.0%  offroad   4.0  04:15(k3)
+  [E1] 2026     meal     q<=1.5h  net $  944.79  feas 100.0%  offroad   4.0  04:15(k3)
+  [E1] 2026     meal     q<=2.0h  net $  944.79  feas 100.0%  offroad   4.0  04:15(k3)
+
+========================================================================
+E2  the policy comparison
+========================================================================
+  [E2] v2-2024  Optimiser (cyclic MDP)     net $  887.34  feas  82.4%  missed  0.13  offroad   8.0
+  [E2] v2-2024  DP (expected value)        net $  869.03  feas  95.2%  missed  0.02  offroad   8.3
+  [E2] v2-2024  DP (capacity-aware)        net $  875.05  feas  56.2%  missed  0.44  offroad   9.3
+  [E2] v2-2024  Rule: cheapest-net         net $  756.02  feas  40.9%  missed  3.21  offroad   9.0
+  [E2] v2-2024  Rule: cheapest-plug        net $  785.29  feas  14.0%  missed  4.69  offroad   5.0
+  [E2] v2-2024  Rule: cheapest-depart      net $  785.29  feas  14.0%  missed  4.69  offroad   5.0
+  [E2] v2-2024  Rule: threshold            net $  791.58  feas  99.2%  missed  0.00  offroad  13.1
+  [E2] v2-2024  Rule: charge-full          net $  837.40  feas  99.3%  missed  0.00  offroad   9.0
+  [E2] v2-2024  Rule: never-charge         net $    0.00  feas   0.0%  missed 34.90  offroad   0.0
+  [E2] 2026     Optimiser (cyclic MDP)     net $  944.79  feas 100.0%  missed  0.00  offroad   4.0
+  [E2] 2026     DP (expected value)        net $  944.84  feas  99.9%  missed  0.00  offroad   4.0
+  [E2] 2026     DP (capacity-aware)        net $  944.71  feas  99.8%  missed  0.00  offroad   4.0
+  [E2] 2026     Rule: cheapest-net         net $  934.21  feas  99.9%  missed  0.00  offroad   7.0
+  [E2] 2026     Rule: cheapest-plug        net $  921.88  feas 100.0%  missed  0.00  offroad   4.1
+  [E2] 2026     Rule: cheapest-depart      net $  921.88  feas 100.0%  missed  0.00  offroad   4.1
+  [E2] 2026     Rule: threshold            net $  854.03  feas 100.0%  missed  0.00  offroad   7.9
+  [E2] 2026     Rule: charge-full          net $  886.74  feas 100.0%  missed  0.00  offroad   5.4
+  [E2] 2026     Rule: never-charge         net $    0.00  feas   8.1%  missed 34.90  offroad   0.0
+
+========================================================================
+E3  the refusal penalty
+========================================================================
+  [E3] v2-2024  penalty $  0.0  net $  887.34  feas  82.4%  missed  0.13  00:00(k1)|04:15(k2)|18:15(k1)
+  [E3] v2-2024  penalty $  0.5  net $  887.37  feas  83.4%  missed  0.05  00:00(k1)|04:15(k2)|18:15(k1)
+  [E3] v2-2024  penalty $  1.0  net $  887.42  feas  83.4%  missed  0.05  00:00(k1)|04:15(k2)|18:15(k1)
+  [E3] v2-2024  penalty $  2.0  net $  887.45  feas  83.4%  missed  0.05  00:00(k1)|04:15(k2)|18:15(k1)
+  [E3] v2-2024  penalty $  5.0  net $  887.47  feas  83.4%  missed  0.05  00:00(k1)|04:15(k2)|18:15(k1)
+  [E3] v2-2024  penalty $ 10.0  net $  887.44  feas  83.6%  missed  0.05  00:00(k1)|04:15(k2)|18:15(k1)
+  [E3] v2-2024  penalty $ 20.0  net $  887.22  feas  88.1%  missed  0.03  00:00(k1)|04:15(k2)|18:15(k1)
+  [E3] v2-2024  penalty $ 28.0  net $  887.42  feas  89.2%  missed  0.02  00:00(k1)|04:15(k2)|18:15(k1)
+  [E3] v2-2024  penalty $ 50.0  net $  886.85  feas  94.2%  missed  0.01  00:00(k1)|04:15(k2)|18:15(k1)
+  [E3] 2026     penalty $  0.0  net $  944.79  feas 100.0%  missed  0.00  04:15(k3)
+  [E3] 2026     penalty $  0.5  net $  944.79  feas 100.0%  missed  0.00  04:15(k3)
+  [E3] 2026     penalty $  1.0  net $  944.79  feas 100.0%  missed  0.00  04:15(k3)
+  [E3] 2026     penalty $  2.0  net $  944.81  feas 100.0%  missed  0.00  04:15(k3)
+  [E3] 2026     penalty $  5.0  net $  944.81  feas 100.0%  missed  0.00  04:15(k3)
+  [E3] 2026     penalty $ 10.0  net $  944.81  feas 100.0%  missed  0.00  04:15(k3)
+  [E3] 2026     penalty $ 20.0  net $  944.81  feas 100.0%  missed  0.00  04:15(k3)
+  [E3] 2026     penalty $ 28.0  net $  944.81  feas 100.0%  missed  0.00  04:15(k3)
+  [E3] 2026     penalty $ 50.0  net $  944.81  feas 100.0%  missed  0.00  04:15(k3)
+
+========================================================================
+E4  the hardware calibration
+========================================================================
+  [E4] v2-2024  battery_kwh    25.0     net $  854.74  feas  80.2%  gain over charge-full      $  44.56
+  [E4] v2-2024  battery_kwh    40.0     net $  887.34  feas  82.4%  gain over charge-full      $  49.93
+  [E4] v2-2024  battery_kwh    57.6     net $  939.86  feas  97.1%  gain over cheapest-net     $   9.91
+  [E4] v2-2024  battery_kwh    80.0     net $  942.57  feas  99.4%  gain over cheapest-net     $   6.73
+  [E4] v2-2024  charge_kw      30.0     net $  873.68  feas  80.8%  gain over charge-full      $  51.75
+  [E4] v2-2024  charge_kw      60.0     net $  887.34  feas  82.4%  gain over charge-full      $  49.93
+  [E4] v2-2024  charge_kw      90.0     net $  888.87  feas  82.8%  gain over charge-full      $  40.09
+  [E4] v2-2024  charge_kw      120.0    net $  887.46  feas  81.9%  gain over threshold        $  24.24
+  [E4] v2-2024  charge_kw      250.0    net $  881.72  feas  79.2%  gain over threshold        $  24.11
+  [E4] v2-2024  kwh_per_km     0.15     net $  943.91  feas  97.9%  gain over cheapest-net     $   3.89
+  [E4] v2-2024  kwh_per_km     0.17     net $  935.21  feas  87.9%  gain over cheapest-plug    $  29.97
+  [E4] v2-2024  kwh_per_km     0.19     net $  915.82  feas  80.1%  gain over cheapest-plug    $  45.71
+  [E4] v2-2024  kwh_per_km     0.22     net $  887.34  feas  82.4%  gain over charge-full      $  49.93
+  [E4] v2-2024  kwh_per_km     0.25     net $  872.78  feas  87.9%  gain over charge-full      $  49.26
+  [E4] v2-2024  reserve_soc    0.05     net $  908.14  feas  79.7%  gain over cheapest-plug    $  55.26
+  [E4] v2-2024  reserve_soc    0.1      net $  898.15  feas  79.7%  gain over charge-full      $  60.61
+  [E4] v2-2024  reserve_soc    0.15     net $  887.34  feas  82.4%  gain over charge-full      $  49.93
+  [E4] v2-2024  reserve_soc    0.2      net $  881.56  feas  87.2%  gain over charge-full      $  45.02
+  [E4] v2-2024  reserve_soc    0.25     net $  876.74  feas  91.4%  gain over charge-full      $  42.66
+  [E4] v2-2024  queue_shape    uniform  net $  865.30  feas  74.9%  gain over charge-full      $  52.38
+  [E4] v2-2024  queue_shape    demand   net $  885.14  feas  78.4%  gain over charge-full      $  62.76
+  [E4] v2-2024  queue_shape    idle     net $  893.18  feas  87.6%  gain over charge-full      $  43.16
+  [E4] v2-2024  queue_shape    meal     net $  887.34  feas  82.4%  gain over charge-full      $  49.93
+  [E4] 2026     battery_kwh    25.0     net $  879.43  feas  94.5%  gain over threshold        $  33.10
+  [E4] 2026     battery_kwh    40.0     net $  917.86  feas  79.4%  gain over cheapest-plug    $  45.93
+  [E4] 2026     battery_kwh    57.6     net $  944.79  feas 100.0%  gain over cheapest-net     $  10.58
+  [E4] 2026     battery_kwh    80.0     net $  944.30  feas  97.8%  gain over cheapest-net     $   4.59
+  [E4] 2026     charge_kw      30.0     net $  933.30  feas  99.8%  gain over charge-full      $  99.93
+  [E4] 2026     charge_kw      60.0     net $  942.96  feas  99.9%  gain over cheapest-net     $   9.22
+  [E4] 2026     charge_kw      90.0     net $  944.79  feas 100.0%  gain over cheapest-net     $  10.58
+  [E4] 2026     charge_kw      120.0    net $  944.30  feas  99.9%  gain over cheapest-net     $   2.51
+  [E4] 2026     charge_kw      250.0    net $  944.88  feas  99.9%  gain over cheapest-net     $  -0.42
+  [E4] 2026     kwh_per_km     0.15     net $  947.18  feas  99.1%  gain over cheapest-net     $   7.50
+  [E4] 2026     kwh_per_km     0.17     net $  946.03  feas  99.6%  gain over cheapest-net     $   9.74
+  [E4] 2026     kwh_per_km     0.19     net $  944.79  feas 100.0%  gain over cheapest-net     $  10.58
+  [E4] 2026     kwh_per_km     0.22     net $  941.64  feas  97.1%  gain over cheapest-net     $   9.67
+  [E4] 2026     kwh_per_km     0.25     net $  930.01  feas  84.2%  gain over cheapest-plug    $  31.11
+  [E4] 2026     reserve_soc    0.05     net $  945.04  feas 100.0%  gain over cheapest-net     $   9.52
+  [E4] 2026     reserve_soc    0.1      net $  944.87  feas 100.0%  gain over cheapest-net     $  10.53
+  [E4] 2026     reserve_soc    0.15     net $  944.79  feas 100.0%  gain over cheapest-net     $  10.58
+  [E4] 2026     reserve_soc    0.2      net $  944.50  feas  99.7%  gain over cheapest-net     $  10.48
+  [E4] 2026     reserve_soc    0.25     net $  943.16  feas  98.5%  gain over cheapest-net     $   1.99
+  [E4] 2026     queue_shape    uniform  net $  935.95  feas  99.9%  gain over cheapest-net     $  -0.19
+  [E4] 2026     queue_shape    demand   net $  944.79  feas 100.0%  gain over cheapest-net     $  10.58
+  [E4] 2026     queue_shape    idle     net $  936.10  feas  99.9%  gain over cheapest-net     $  -0.04
+  [E4] 2026     queue_shape    meal     net $  944.79  feas 100.0%  gain over cheapest-net     $  10.58
+
+========================================================================
+E5  the price structure
+========================================================================
+  [E5] v2-2024  tou     net $  887.34  spread 3.8x  gain over charge-full      $  49.93  00:00(k1)|04:15(k2)|18:15(k1)
+  [E5] v2-2024  market  net $  887.11  spread 3.5x  gain over charge-full      $  48.58  00:00(k1)|04:15(k2)|15:45(k1)
+  [E5] 2026     tou     net $  944.79  spread 3.8x  gain over cheapest-net     $  10.58  04:15(k3)
+  [E5] 2026     market  net $  942.46  spread 3.5x  gain over cheapest-net     $  -0.02  04:15(k3)
+
+========================================================================
+E6  the master sweep: how tight is the energy budget?
+========================================================================
+  [E6] v2-2024  u=0.40 batt= 40.0   116.5 km/day  budget 0.75  net $  516.05  gain over cheapest-net     $   1.90 (  0.4%)
+  [E6] v2-2024  u=0.40 batt= 57.6   116.5 km/day  budget 0.52  net $  517.14  gain over cheapest-net     $   3.28 (  0.6%)
+  [E6] v2-2024  u=0.55 batt= 40.0   160.2 km/day  budget 1.04  net $  668.44  gain over cheapest-net     $   4.01 (  0.6%)
+  [E6] v2-2024  u=0.55 batt= 57.6   160.2 km/day  budget 0.72  net $  673.81  gain over cheapest-net     $   2.37 (  0.4%)
+  [E6] v2-2024  u=0.70 batt= 40.0   203.9 km/day  budget 1.32  net $  788.22  gain over cheapest-plug    $  42.63 (  5.7%)
+  [E6] v2-2024  u=0.70 batt= 57.6   203.9 km/day  budget 0.92  net $  815.14  gain over cheapest-net     $   7.63 (  0.9%)
+  [E6] v2-2024  u=0.85 batt= 40.0   247.6 km/day  budget 1.60  net $  887.34  gain over charge-full      $  49.93 (  6.0%)
+  [E6] v2-2024  u=0.85 batt= 57.6   247.6 km/day  budget 1.11  net $  939.86  gain over cheapest-net     $   9.91 (  1.1%)
+  [E6] v2-2024  u=1.00 batt= 40.0   291.2 km/day  budget 1.88  net $  985.61  gain over charge-full      $  53.08 (  5.7%)
+  [E6] v2-2024  u=1.00 batt= 57.6   291.2 km/day  budget 1.31  net $1,049.08  gain over cheapest-plug    $  34.83 (  3.4%)
+  [E6] 2026     u=0.40 batt= 40.0   116.5 km/day  budget 0.65  net $  517.43  gain over cheapest-net     $   0.37 (  0.1%)
+  [E6] 2026     u=0.40 batt= 57.6   116.5 km/day  budget 0.45  net $  518.01  gain over cheapest-net     $   0.35 (  0.1%)
+  [E6] 2026     u=0.55 batt= 40.0   160.2 km/day  budget 0.90  net $  673.77  gain over cheapest-net     $   1.75 (  0.3%)
+  [E6] 2026     u=0.55 batt= 57.6   160.2 km/day  budget 0.62  net $  675.45  gain over cheapest-net     $   0.60 (  0.1%)
+  [E6] 2026     u=0.70 batt= 40.0   203.9 km/day  budget 1.14  net $  809.48  gain over cheapest-net     $  17.16 (  2.2%)
+  [E6] 2026     u=0.70 batt= 57.6   203.9 km/day  budget 0.79  net $  817.08  gain over cheapest-net     $   4.27 (  0.5%)
+  [E6] 2026     u=0.85 batt= 40.0   247.6 km/day  budget 1.38  net $  917.86  gain over cheapest-plug    $  45.93 (  5.3%)
+  [E6] 2026     u=0.85 batt= 57.6   247.6 km/day  budget 0.96  net $  944.79  gain over cheapest-net     $  10.58 (  1.1%)
+  [E6] 2026     u=1.00 batt= 40.0   291.2 km/day  budget 1.63  net $1,007.23  gain over charge-full      $  46.54 (  4.8%)
+  [E6] 2026     u=1.00 batt= 57.6   291.2 km/day  budget 1.13  net $1,061.43  gain over cheapest-net     $  15.23 (  1.5%)
+
+========================================================================
+E7  the demand model: book value is not executability
+========================================================================
+  [E7] v2-2024  book dp $    6.38  dp_ca $    5.21  mdp $    4.92   gap    1.47 ->   0.30
+  [E7] 2026     book dp $    3.72  dp_ca $    1.66  mdp $    4.54   gap   -0.82 ->  -2.88
+
+results written to E:\Ufolder\Current\ActionSys\Hgclass\OM\proj\ÍøÔ¼³µ³äµç\results

@@ -372,6 +372,61 @@ def main() -> None:
            extra={"lambda_flat": lam_flat,
                   "day_energy_kwh": env6.energy_served_total()})
 
+    # ------------------------------------------------------------ A7
+    # The billing regime is the one modelling choice in the paper that is
+    # NOT pinned down by data: a driver may pay for the charger SLOT at rated
+    # power (occupancy / time billing) or for the electricity actually drawn
+    # (energy billing). Both exist at Chinese public DC chargers. The two
+    # regimes are not interchangeable: under occupancy billing the CC-CV
+    # taper creates a steep marginal cost per delivered kWh, under energy
+    # billing it cancels. So we solve the whole model under both and check
+    # whether the SCHEDULE and the GAP depend on it.
+    print()
+    print("A7  switch the charging-pricing regime (slot vs. energy billing)")
+    env7 = Env(billing="kwh")
+    _, pol7 = solve_mdp(env7, kmax=6)
+    r7 = record("A7 energy billing", "occupancy (slot) pricing", env7, pol7,
+                "driver pays per kWh drawn instead of per charger slot",
+                extra={"billing": "kwh"})
+
+    def marginal_profile(e):
+        """Cost per kWh DELIVERED by a charging slot started at each SOC level,
+        at the shoulder tariff. This is the quantity plotted in Figure 4."""
+        t = 48                       # 12:00, shoulder tier
+        p = e.price[t]
+        out = []
+        for s in e.soc:
+            tau = float(np.asarray(taper(s, e.eta_cc)).reshape(-1)[0])
+            if e.billing == "kwh":
+                # pay for the grid energy actually drawn; the taper cancels
+                # out of the ratio, so the rate is flat at price / eta
+                out.append(p / e.eta_c)
+            else:
+                # pay for the whole slot at rated power; the taper divides
+                grid = max(e.p_kw * tau * e.dt_h, 1e-9)
+                delivered = grid * e.eta_c
+                out.append(p * e.p_kw * e.dt_h / delivered)
+        return np.array(out)
+
+    def at_soc(profile, target):
+        i = int(np.argmin(np.abs(env.soc - target)))
+        return float(profile[i])
+
+    m_slot = marginal_profile(env)
+    m_kwh = marginal_profile(env7)
+    for tgt in (0.80, 1.00):
+        print(f"    marginal $/kWh at {tgt:.0%} SOC :"
+              f" ${at_soc(m_slot, tgt):.2f} (slot billing)"
+              f"  vs  ${at_soc(m_kwh, tgt):.2f} (energy billing)")
+    r7["marginal_usd_per_kwh_at_80pct_slot_billing"] = at_soc(m_slot, 0.80)
+    r7["marginal_usd_per_kwh_at_80pct_energy_billing"] = at_soc(m_kwh, 0.80)
+    r7["marginal_usd_per_kwh_at_100pct_slot_billing"] = at_soc(m_slot, 1.00)
+    r7["marginal_usd_per_kwh_at_100pct_energy_billing"] = at_soc(m_kwh, 1.00)
+    r7["marginal_ratio_slot_billing"] = (at_soc(m_slot, 1.00)
+                                         / max(at_soc(m_slot, 0.80), 1e-9))
+    r7["marginal_ratio_energy_billing"] = (at_soc(m_kwh, 1.00)
+                                           / max(at_soc(m_kwh, 0.80), 1e-9))
+
     df = pd.DataFrame(rows)
     df.to_csv(os.path.join(OUT, "ablations.csv"), index=False)
     print(f"\nwrote {os.path.join(OUT, 'ablations.csv')}")

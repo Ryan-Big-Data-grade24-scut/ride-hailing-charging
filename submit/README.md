@@ -13,10 +13,10 @@
 
 | # | 交付物 | 形式 | 状态 |
 |---|---|---|---|
-| **1** | **英文论文** | Word（.docx）+ PDF | ✅ **已写完**：6,200 词 / 18 页 / 13 个原生公式 / 9 表 4 图 |
+| **1** | **英文论文** | Word（.docx）+ PDF | ✅ **已写完**：28 页 / 12,567 词 / 18 个编号公式（114 个原生公式对象）/ 14 表 5 图 |
 | **2** | **核心代码** | 本仓库 `code/`（连同 `data/` 需求画像） | ✅ 已就绪 |
 | **3** | **主要数据集 或 数据来源说明** | 数据是 NYC TLC 公开数据，**写清楚来源+清洗规则即可** | ✅ 见 `docs/experiment/` §1 |
-| **4** | **答辩 PPT** | .pptx（另存 PDF 备份） | ✅ 12 页，指南 §7 的 9 段结构全覆盖 |
+| **4** | **答辩 PPT** | .pptx（另存 PDF 备份） | ✅ 13 页，指南 §7 的 9 段结构全覆盖 |
 
 **成绩构成**：课堂互动 30% + 期末大作业 **70%**
 
@@ -43,7 +43,7 @@
 | 图/表题注 | 约 10 pt |
 | 参考文献 | 10 pt |
 
-### ✅ 格式自查结果（2026-10-24，已逐条核验 `.docx` 内部 XML）
+### ✅ 格式自查结果（2026-11-17，已逐条核验 `.docx` 内部 XML）
 
 | 项 | 要求 | 实测 | 怎么验的 |
 |---|---|---|---|
@@ -53,11 +53,11 @@
 | 标题/作者/摘要/H1/H2/H3 | 14pt粗 / 10.5 / 10.5 / 12粗 / 10.5粗 / 10.5斜 | 28/21/21/24/21/21 半磅 | ✅ |
 | 正文 | 10.5pt / 1.5 倍 / 两端对齐 | `sz=21`、`line=360 auto`、`jc=both` | ✅ |
 | 题注 / 参考文献 | 约 10pt / 10pt | `sz=20` | ✅ |
-| **公式** | **Word 公式对象，禁止贴图** | **101 个 `<m:oMath>`，media 里只有 4 张图（无公式图片）** | ✅ |
-| 公式编号 | 顺序 (1)…(13) | 全部存在 | ✅ |
-| 图表编号 | 按首次出现顺序 | 图 1–4、表 1–9 | ✅ |
+| **公式** | **Word 公式对象，禁止贴图** | **114 个 `<m:oMath>`，media 里只有 5 张图（无公式图片）** | ✅ |
+| 公式编号 | 顺序 (1)…(18) | 全部存在 | ✅ |
+| 图表编号 | 按首次出现顺序 | 图 1–5、表 1–14 | ✅ |
 | 图题在下、表题在上 | 指南 §6.4 | 已核对 | ✅ |
-| 摘要 | ≤250 词 | 239 词 | ✅ |
+| 摘要 | ≤250 词 | 250 词 | ✅ |
 | 关键词 | 3–7 个 | 7 个 | ✅ |
 | 参考文献 | 按首次出现编号、含 DOI | [1]–[12] 顺序无缺漏 | ✅ |
 
@@ -183,25 +183,37 @@ Appendix
 
 ```
 submit/
-├── Final_Paper_梁睿希_202464870791.docx      ← 英文论文（提交用，18 页）
+├── Final_Paper_梁睿希_202464870791.docx      ← 英文论文（提交用，28 页）
 ├── Final_Paper_梁睿希_202464870791.pdf       ← 同上导出的 PDF（用 Word 导，勿用 LibreOffice）
 ├── paper.md                                   ← 论文 Markdown 源（改内容改这个）
-├── Defense_梁睿希_202464870791.pptx            ← 答辩 PPT（12 页，11/20 同批交）
+├── Defense_梁睿希_202464870791.pptx            ← 答辩 PPT（13 页，11/20 同批交）
 ├── Defense_梁睿希_202464870791.pdf             ← PPT 的 PDF 备份
 ├── code/                                      ← 核心代码（src/ + build_profile.py）
 ├── data/
 │   ├── profile.json                           ← 需求画像（生成物，直接给）
 │   ├── demand_profile.csv                     ← 96 格明细（人类可读）
 │   └── DATA_SOURCE.md                         ← 数据来源与清洗规则说明
-├── figures/                                   ← 4 张图
+├── figures/                                   ← 5 张图（含 F5 排队成本图）
 ├── tools/                                     ← 排版与导出脚本（复现用，可不打包）
 │   ├── make_reference_docx.py                 ← 定义全部 Word 样式（字号/行距/字体）
 │   ├── fix_table_widths.py                    ← 表格列宽按内容分配，数字不断行
 │   ├── fix_eq_tags.py / fix_lbrace_space.py   ← 修公式编号与 \lbrace 粘连
 │   ├── docx_to_pdf.py                         ← Word COM 导 PDF（唯一安全路径）
 │   ├── make_ppt.py                            ← 生成答辩 PPT
+│   ├── pptx_to_pdf.py                         ← PowerPoint COM 导 PDF（PPT 用）
 │   └── read_guide.py                          ← 从指南原件提取格式条款
 └── README.md                                  ← 本文件
+```
+
+### v3 扩展（§3.6）新增文件
+
+```
+code/src/run_v3.py          ← excursion 扩展的全部实验（E1–E7），支持按阶段跑：python run_v3.py E1 E2
+code/src/ev_dp3.py         ← v3 的 DP 求解器（期望值 / 容量感知两种口径）
+code/src/make_figures3.py  ← 生成 F5 排队成本图
+figures/F5_queue_cost.png   ← 图 5
+results/v3_*.csv           ← v3 全部实验结果（可复现）
+docs/experiment/v3-results.md ← v3 实验记录与更正说明
 ```
 
 **修改论文的正确流程**：`submit/paper.md` 改内容 → `tools/make_reference_docx.py`（若改样式）→ pandoc 出 docx → `tools/fix_*.py` 依次修 → `tools/docx_to_pdf.py` 导 PDF。

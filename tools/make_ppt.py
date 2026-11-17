@@ -423,23 +423,28 @@ fig_with_caption(s, "F2_policy_comparison.png", Inches(0.62), Inches(1.55),
 table(s, [
     ["Policy", "Net ($/day)", "Feasible"],
     ["MDP (ours)", "$946.46", "95%"],
-    ["DP (perfect forecast)", "$934.15", "85%"],
+    ["DP (capacity-aware)", "$936.08", "78%"],
+    ["DP (mean demand)", "$934.15", "85%"],
     ["Charge-to-full rule", "$911.06", "82%"],
     ["Cheapest-hour rule", "$788.21", "11%"],
     ["Never charge", "$600.09", "0%"],
-], Inches(8.45), Inches(1.60), Inches(4.3), Inches(2.6), size=13,
+], Inches(8.45), Inches(1.60), Inches(4.3), Inches(3.1), size=13,
     col_w=[2.6, 1.6, 1.3])
 
 bullets(s, [
     ("+$158.25/day (+20.1%) over the cheapest-hour rule", 0, ACC, True),
     ("+$21.47/day (+2.3%) over a perfect-forecast deterministic DP", 0,
      GRN, True),
-    "The perfect-forecast DP is not the benchmark to beat — it wins on "
-    "earnings but fails feasibility 10% more often, because a static plan "
-    "cannot adapt to a bad draw.",
     "Feasibility is a first-class metric: a policy that strands the driver "
     "at 0% SOC is worthless even at a high average.",
-], Inches(0.62), Inches(4.85), Inches(12.1), Inches(2.0), size=16)
+    ("Book value is not executability", 0, ACC, True),
+    "The deterministic plan books $1,242.61 against the MDP's $939.55 — a "
+    "$303 gap. But 95% of that gap ($303 → $14) is a Jensen artefact of "
+    "truncating service at capacity, not the price of uncertainty.",
+    "Even the capacity-aware plan ($953.68 book) fails on 21.7% of days, "
+    "because it leaves no margin; the MDP, which plans for the realisation "
+    "rather than its mean, completes 95.0%.",
+], Inches(0.62), Inches(4.95), Inches(12.1), Inches(2.4), size=15, gap=6)
 
 
 # ============================================ 8. SENSITIVITY / EXTENSION
@@ -464,14 +469,50 @@ bullets(s, [
     ("Multi-day cycle", 0, ACC, True),
     "Cyclic MDP: μ = $0.2414/kWh shadow price, optimal start-of-day SOC "
     "36.8%, steady-state charging at 04:45 and 12:00.",
+    ("Excursion model (next slide)", 0, ACC, True),
+    "Charging as drive + queue + charge + return: the gain over the best "
+    "rule rises from 2.3% to 6.0%.",
 ], Inches(8.75), Inches(1.60), Inches(4.0), Inches(5.2), size=15)
 
 
-# ============================================ 9. KEY INSIGHT
+
+# ============================================ 9. EXCURSION EXTENSION
+s = slide_base(
+    "Extension: charging is an excursion, and the queue is not free",
+    "The real cost of charging is the trip — drive to the station, wait, "
+    "plug in, drive back.", number=9)
+
+fig_with_caption(s, "F5_queue_cost.png", Inches(0.62), Inches(1.50),
+                 Inches(7.9), Inches(4.30),
+                 "Net earnings against the peak queue length, for the 40 kWh "
+                 "car (left), the 57.6 kWh car (centre), and the mechanism — "
+                 "slots spent off the road (right).")
+
+bullets(s, [
+    ("Charging = drive + queue + charge + return", 0, ACC, True),
+    "The state space does not grow: the queue is exogenous, so it needs "
+    "no state of its own (still 8,256 states).",
+    "The opportunity cost is no longer a term in the objective — it "
+    "emerges: no fare can be collected while the driver is away.",
+    ("What the queue costs", 0, ACC, True),
+    "40 kWh car: a 2-hour queue costs $24–$79/day and drops feasibility "
+    "from 87.6% to 61.9%.",
+    "57.6 kWh car: the same queue costs about $0 — a bigger pack lets the "
+    "driver leave early and dodge it.",
+    ("Larger than the whole optimisation gain", 0, ACC, True),
+    "Optimisation is worth $21.47/day in the simple model; the queue is "
+    "worth up to $79.",
+    ("And when is optimisation worth it at all?", 0, ACC, True),
+    "Only when the battery binds: if usable energy is below 1.1x the day's "
+    "need, the gain is under 1%; above it, 6%.",
+], Inches(8.75), Inches(1.45), Inches(4.05), Inches(5.3), size=12, gap=4)
+
+
+# ============================================ 10. KEY INSIGHT
 s = slide_base(
     "Key insight: the cheapest hour is the wrong hour",
     "This is the one figure we would keep if we could only keep one.",
-    number=9)
+    number=10)
 
 rect(s, Inches(0.62), Inches(1.60), Inches(12.1), Inches(1.35), fill=LGT)
 rect(s, Inches(0.62), Inches(1.60), Inches(0.07), Inches(1.35), fill=ACC)
@@ -505,17 +546,16 @@ fig_with_caption(s, "F1_day_in_picture.png", Inches(7.85), Inches(3.05),
 s = slide_base(
     "Conclusion",
     "Direct answer to the research question, with the conditions attached.",
-    number=10)
+    number=11)
 
 bullets(s, [
     ("Finding 1.", 0, ACC, True),
     "Charging at the tariff minimum is the worst reasonable rule: "
     "$788.21/day and 11% feasibility, against $946.46/day and 95% for the "
-    "optimal policy — a 20.1% gain.",
+    "optimal policy.",
     ("Finding 2.", 0, ACC, True),
     "The optimal policy is strongly valley-anchored (74.4% of days charge "
-    "off-valley, 100% charge after midnight) but not valley-exclusive: "
-    "25.6% of days stay entirely in the valley.",
+    "off-valley) but not valley-exclusive: 25.6% stay entirely in the valley.",
     ("Finding 3.", 0, ACC, True),
     "The decision is driven by demand availability, not by price: 18.5× "
     "demand spread vs a 3.8× tariff spread, so the opportunity cost of an "
@@ -523,16 +563,29 @@ bullets(s, [
     ("Finding 4.", 0, ACC, True),
     "Across a multi-day cycle, stored energy is worth μ = $0.2414/kWh and "
     "the optimal start-of-day SOC is 36.8%.",
-], Inches(0.62), Inches(1.55), Inches(12.1), Inches(4.2), size=15, gap=5)
+    ("Finding 5 (corrected).", 0, ACC, True),
+    "Book value is not executability: the $303 gap between a deterministic "
+    "plan's book value and the MDP's is 95% a Jensen artefact of capacity "
+    "truncation, not the price of uncertainty.",
+    ("Finding 6.", 0, ACC, True),
+    "Charging is a trip, not a slot. With the queue in the model the gain "
+    "over the best rule rises from 2.3% to 6.0%, and a 2-hour queue is "
+    "worth $24–$79/day — more than the whole optimisation gain.",
+    ("Finding 7.", 0, ACC, True),
+    "Optimising is worth it only when the battery binds: the gain is under "
+    "1% while usable energy is below 1.1x the day's consumption, and 6% "
+    "above it. The hardware decides, not the algorithm.",
+], Inches(0.62), Inches(1.42), Inches(12.1), Inches(4.5), size=12, gap=2)
 
 rect(s, Inches(0.62), Inches(5.95), Inches(12.1), Inches(0.95), fill=LGT)
 tf = tb(s, Inches(0.90), Inches(6.07), Inches(11.6), Inches(0.8))
 put(tf, "Limitations and next steps", size=13, bold=True, color=ACC,
     first=True, space_after=3)
 put(tf, "Single driver (the fleet-scale version needs a different "
-        "treatment); the tariff is an assumption, not a measured price; "
-        "revenue is modelled as a deterministic rate. Next: multi-agent "
-        "congestion, and pricing the charging slot as a market.",
+        "treatment); the tariff is an assumption, not a measured price; the "
+        "charger queue is exogenous, so a driver's own decision cannot "
+        "lengthen the queue he faces. Next: an endogenous queue, a finer "
+        "charging sub-grid, and multi-agent congestion.",
     size=13, color=RGBColor(0x33, 0x3D, 0x4C))
 
 
@@ -540,12 +593,13 @@ put(tf, "Single driver (the fleet-scale version needs a different "
 s = slide_base(
     "Backup: verification and reproducibility",
     "Because every number in the paper is regenerated by one script.",
-    number=11)
+    number=12)
 
 table(s, [
     ["Check", "Result"],
     ["Planner vs simulator consistency", "2.25 standard errors (consistent rule); 2.31 SE (legacy rule)"],
     ["Bellman residual (cyclic MDP)", "9.29 × 10⁻¹⁰ after 34 sweeps"],
+    ["Bellman residual (excursion MDP)", "7.01 × 10⁻¹⁰ after 36 sweeps"],
     ["Formula validation", "105 LaTeX formulas checked with KaTeX, 0 failures"],
     ["Paper equations in Word", "101 native OMML equation objects, 0 pasted images"],
     ["Data", "2,803,713 cleaned trips; 2,739,936 in-profile over 30 full days"],
@@ -565,7 +619,7 @@ bullets(s, [
 s = slide_base(
     "Backup: expected questions",
     "The guide lists eight questions we should be ready for; three of them "
-    "have non-trivial answers.", number=12)
+    "have non-trivial answers.", number=13)
 
 table(s, [
     ["Question", "Short answer"],
@@ -578,7 +632,9 @@ table(s, [
     ["Why does the optimal solution have this shape?",
      "Because the value of a slot is the demand it forgoes; when demand is flat, the tariff decides, and when demand is steep, the tariff cannot outvote it."],
     ["What if a key parameter changes?",
-     "7 sensitivity sweeps: the gain over the tariff-following rule stays positive and grows as the energy budget tightens."],
+     "7 sensitivity sweeps: the gain over the tariff-following rule stays positive and grows as the energy budget tightens — under 1% while the battery does not bind, 6% once it does."],
+    ["What if the charger is busy?",
+     "We model the queue as exogenous and sweep four shapes × five levels: a 2-hour queue costs $24–$79/day on the 40 kWh car and about $0 on the 57.6 kWh car, which can simply leave early. An endogenous queue — drivers competing for the same charger — is the next step."],
     ["Would the conclusion hold under different assumptions?",
      "Yes for the tariff shape and fare level (re-calibrated VOT still gives 16 of 96 slots below $15.20/h) — but a flat tariff would collapse the problem to a pure energy-balance question."],
 ], Inches(0.62), Inches(1.60), Inches(12.1), Inches(4.9), size=12,

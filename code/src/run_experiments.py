@@ -50,37 +50,53 @@ def main() -> None:
 
     dp0 = V_dp[0, env.to_idx(0.80)]
     mdp0 = V_mdp[0, env.to_idx(0.80)]
+
+    # A third deterministic baseline. The DP above is solved on an
+    # environment whose expected service is min(lambda, cap) -- what a
+    # deterministic plan assumes. The capacity-aware DP is the same
+    # recursion on an environment whose expected service is the honest
+    # E[min(N, cap)], which is 20% lower in every slot at the calibrated
+    # profile. It is evaluated on the SAME simulator as every other policy,
+    # because the simulator is not the thing under test.
+    env_ca = Env(cap_aware=True)
+    print("solving capacity-aware DP ...", flush=True)
+    V_dp_ca, pol_dp_ca = solve_dp(env_ca)
+    dpca0 = V_dp_ca[0, env.to_idx(0.80)]
+
     print(f"  DP  value at (t=0, s=80%) = ${dp0:,.2f}")
+    print(f"  DP-ca value at (t=0, s=80%) = ${dpca0:,.2f}")
     print(f"  MDP value at (t=0, s=80%) = ${mdp0:,.2f}")
     print()
 
     # ------------------------------------------------------------ baselines
     print("evaluating policies ({} Monte-Carlo days each) ...".format(N_SIMS))
     policies = {
-        "MDP (stochastic DP)": ("mdp", pol_mdp),
-        "DP (expected value)": ("dp", pol_dp),
-        "Baseline: charge to full when SOC<40%": ("charge-full", None),
-        "Baseline: never charge": ("never-charge", None),
-        "Baseline: charge at cheapest hour": ("cheapest", None),
-        "Baseline: threshold SOC<30%": ("threshold", None),
-        "Baseline: threshold SOC<40%": ("threshold", None),
-        "Baseline: threshold SOC<50%": ("threshold", None),
+        "MDP (stochastic DP)": ("mdp", pol_mdp, mdp0),
+        "DP (expected value)": ("dp", pol_dp, dp0),
+        "DP (capacity-aware)": ("dp", pol_dp_ca, dpca0),
+        "Baseline: charge to full when SOC<40%": ("charge-full", None, None),
+        "Baseline: never charge": ("never-charge", None, None),
+        "Baseline: charge at cheapest hour": ("cheapest", None, None),
+        "Baseline: threshold SOC<30%": ("threshold", None, None),
+        "Baseline: threshold SOC<40%": ("threshold", None, None),
+        "Baseline: threshold SOC<50%": ("threshold", None, None),
     }
     rows = []
-    for name, (kind, pol) in policies.items():
+    for name, (kind, pol, book) in policies.items():
         kw = {}
         if kind in ("threshold", "charge-full"):
             kw["thresh"] = float(name.split("<")[-1].rstrip("%")) / 100.0
         r = evaluate(env, pol, kind, n_sims=N_SIMS, seed=SEED, **kw)
         r["policy"] = name
+        r["book_value"] = book if book is not None else float("nan")
         rows.append(r)
         print(f"  {name:34s} net=${r['net']:8,.2f} +- {r['net_std']:6,.2f}"
               f"   rev=${r['revenue']:8,.2f}  elec=${r['energy_cost']:6,.2f}"
               f"  feasible={r['feasible_rate']:.0%}")
 
     df_res = pd.DataFrame(rows)[
-        ["policy", "net", "net_std", "revenue", "energy_cost", "energy_used",
-         "charge_kwh", "orders", "final_soc", "feasible_rate"]
+        ["policy", "book_value", "net", "net_std", "revenue", "energy_cost",
+         "energy_used", "charge_kwh", "orders", "final_soc", "feasible_rate"]
     ].sort_values("net", ascending=False)
     df_res.to_csv(os.path.join(OUT, "policy_comparison.csv"), index=False)
 
@@ -152,8 +168,12 @@ def main() -> None:
         numbers for every TOU spread."""
         e2 = Env(**over)
         _, pmdp2 = solve_mdp(e2, kmax=6)
-        rm = evaluate(e2, pmdp2, "mdp", n_sims=150, seed=SEED)
-        rb = evaluate(e2, None, "cheapest", n_sims=150, seed=SEED)
+        # n_sims matches the main comparison (Table 3) on purpose: with the
+        # same seed and the same simulation budget the base row of the spread
+        # sweep reproduces the headline numbers exactly, so the two tables can
+        # be read side by side without a sampling offset.
+        rm = evaluate(e2, pmdp2, "mdp", n_sims=N_SIMS, seed=SEED)
+        rb = evaluate(e2, None, "cheapest", n_sims=N_SIMS, seed=SEED)
         gain = rm["net"] - rb["net"]
         row = {
             "study": label, "parameter": pname, "value": pval,
@@ -203,8 +223,8 @@ def main() -> None:
     for s0 in [0.30, 0.50, 0.80, 0.95]:
         e2 = Env()
         _, pmdp2 = solve_mdp(e2, kmax=6)
-        rm = evaluate(e2, pmdp2, "mdp", n_sims=150, seed=SEED, soc0=s0)
-        rb = evaluate(e2, None, "cheapest", n_sims=150, seed=SEED, soc0=s0)
+        rm = evaluate(e2, pmdp2, "mdp", n_sims=N_SIMS, seed=SEED, soc0=s0)
+        rb = evaluate(e2, None, "cheapest", n_sims=N_SIMS, seed=SEED, soc0=s0)
         gain = rm["net"] - rb["net"]
         row = {"study": f"start SOC {s0:.0%}", "parameter": "soc0", "value": s0,
                "mdp_net": rm["net"], "baseline_net": rb["net"], "gain": gain,
@@ -218,6 +238,32 @@ def main() -> None:
               f"  base=${row['baseline_net']:8,.2f}  gain=${row['gain']:8,.2f}"
               f"  MDPfeas={row['mdp_feasible']:4.0%}"
               f"  ncharge={row['n_charge_slots']}", flush=True)
+
+    # S8: charging efficiency. It was the one parameter in Table 1 that had
+    # neither a published source nor a test, so it gets both: a source and a
+    # sweep. Because the driver pays for the charger SLOT and not for the
+    # energy delivered, efficiency should matter only through how much energy
+    # one slot buys -- if the gain is flat here, the conclusion does not rest
+    # on the value of eta.
+    for e in [0.85, 0.88, 0.92, 0.95, 0.98]:
+        run_case(f"charging efficiency {e:.0%}", "charge_eff", e,
+                 {"eta_c": e})
+
+    # S9: the reserve floor. It is the constraint that makes the energy
+    # budget bind at all (a clamped floor would make charging free), so its
+    # value must not be load-bearing. This sweep is the evidence.
+    for r in [0.05, 0.10, 0.15, 0.20, 0.25]:
+        run_case(f"reserve floor {r:.0%}", "reserve_soc", r,
+                 {"soc_res": r})
+
+    # S10: the charging-pricing regime. Not a continuous parameter but the
+    # one modelling choice with no source at all -- a driver may pay for the
+    # charger slot at rated power (occupancy billing) or for the electricity
+    # actually drawn (energy billing). If the conclusion survives both, the
+    # choice is a documented assumption rather than a hidden lever.
+    for b, lab in [("slot", "billing: slot (occupancy fee)"),
+                   ("kwh", "billing: energy fee")]:
+        run_case(lab, "billing", b, {"billing": b})
 
     pd.DataFrame(sens_rows).to_csv(
         os.path.join(OUT, "sensitivity.csv"), index=False)
