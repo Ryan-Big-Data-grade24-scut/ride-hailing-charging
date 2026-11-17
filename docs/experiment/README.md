@@ -5,7 +5,7 @@
 >
 > **对应论文章节**：§2.2 Data and Assumptions / §3 Results and Discussion
 
-**状态**：核心实验已跑完；消融实验 A1–A6 **全部完成**（`results/ablations.csv`）。
+**状态**：核心实验已跑完；消融实验 A1–A7 **全部完成**（`results/ablations.csv`）。
 
 > ⚠️ **2026-11-17：v3 扩展（把充电当成一次 excursion）已完成。**
 > 全部结果、机制与两个**否定了此前判断**的发现，写在 **[`v3-results.md`](v3-results.md)**。
@@ -137,7 +137,7 @@ $$a_t \in \lbrace \textsf{DRIVE},\ \textsf{CHARGE},\ \textsf{IDLE}\rbrace ,\quad
 
 ## 4. 消融与扩展实验（已完成 ✅）
 
-### 4.1 消融 A1–A6
+### 4.1 消融 A1–A7
 
 消融的目的是回答：**模型里哪个结构是必要的？拿掉会怎样？**
 
@@ -151,6 +151,7 @@ $$a_t \in \lbrace \textsf{DRIVE},\ \textsf{CHARGE},\ \textsf{IDLE}\rbrace ,\quad
 | **A4** | 去掉司机时间上限（CAP → ∞） | 净收入 **\$1,239.90**，充电时刻增至 4 格（04:30 / 09:30 / 18:15 / 22:45），单司机服务订单 34.6 → **46.3** | 时间上限确实是**问题的支点** |
 | **A5** | reserve 硬约束改成 clamp | clamp 模型自认为 \$987.55，但要从 40 kWh 电池取 **44.5 kWh**；用正确物理一测，同一策略只 \$600.09、可行率 **0%** | **约束类型选错 → 定性错误的解** |
 | **A6** | 拉平日内需求形状 | 净收入 **\$1,009.28**，充电时刻 02:30 / 07:45 / 08:45，**三格全落在谷段**；单日订单 34.6 → **46.3** | 机会成本一旦变成常数，**决策权交回给电价** |
+| **A7** | 换成按电量计费（占用充电桩计时 → 按取电量计费） | 净收入 **\$947.95**，增益 +\$159.05，充电时刻 **04:45 / 11:15 / 20:30 完全不变** | **计费口径不是结论的来源**：两种口径下策略一模一样 |
 
 > 输出：`results/ablations.csv`、`results/ablations_summary.json`
 
@@ -203,7 +204,7 @@ v2 之前，**规划器和仿真器的规则不一致**：DP 在电量不足以�
 
 ---
 
-## 5. 敏感性分析（已完成 ✅，7 组）
+## 5. 敏感性分析（已完成 ✅，10 组）
 
 单参数扫描，其余固定在基准值。
 
@@ -286,7 +287,7 @@ v2 之前，**规划器和仿真器的规则不一致**：DP 在电量不足以�
 cd code/src
 python build_profile.py      # 从 parquet 重新生成 data/profile.json（需先下载 47.6MB parquet）
 python run_experiments.py    # 重跑全部策略对比与敏感性 → results/
-python ablations.py          # 消融 A1–A6 + 循环多日 v2 扩展 → results/
+python ablations.py          # 消融 A1–A7 + 循环多日 v2 扩展 → results/
 python vot_check.py          # 打印模型隐含 VOT 与文献对照
 python vot_rescale.py        # VOT 重标定稳健性检验
 python make_figures.py       # 重新生成 figures/
@@ -299,7 +300,7 @@ python make_figures.py       # 重新生成 figures/
 
 ## 8. 待补清单
 
-- [x] 消融 A1–A6（§4.1，已完成）
+- [x] 消融 A1–A7（§4.1，已完成）
 - [x] v2 扩展：循环多日 MDP + 最优起始 SOC（§4.2，已完成）
 - [x] 图 1–4 的**英文 caption**（已写入 `submit/paper.md`）
 - [x] **§5.7 的 VOT 诊断段并入论文 §2.2 Data and Assumptions**
